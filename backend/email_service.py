@@ -1,11 +1,9 @@
 import os
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import logging
+import resend
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pathlib import Path
-import logging
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -15,40 +13,44 @@ load_dotenv(dotenv_path=env_path)
 
 class EmailService:
     def __init__(self):
-        self.smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
-        self.smtp_port = int(os.getenv("SMTP_PORT", "587"))
-        self.smtp_username = os.getenv("SMTP_USERNAME")
-        self.smtp_password = os.getenv("SMTP_PASSWORD")
-        self.from_email = os.getenv("FROM_EMAIL", self.smtp_username)
+        # Use Resend API (works on Render - uses HTTPS, not blocked SMTP ports)
+        self.resend_api_key = os.getenv("RESEND_API_KEY")
+        self.from_email = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
         self.app_url = os.getenv("APP_URL", "http://localhost:5000")
+        
+        # Configure Resend
+        if self.resend_api_key:
+            resend.api_key = self.resend_api_key
+        else:
+            logger.warning('RESEND_API_KEY not set, email functionality disabled')
     
     def send_email(self, to_email: str, subject: str, body: str, is_html: bool = False):
-        """Send an email using SMTP"""
+        """Send an email using Resend API"""
         try:
-            msg = MIMEMultipart()
-            msg['From'] = self.from_email
-            msg['To'] = to_email
-            msg['Subject'] = subject
+            if not self.resend_api_key:
+                logger.warning('Resend API key not configured, email not sent')
+                return False
             
-            msg.attach(MIMEText(body, 'html' if is_html else 'plain'))
+            logger.info(f'Attempting to send email via Resend to {to_email}')
             
-            logger.info('Attempting to send email')
-            logger.debug(f'SMTP server: {self.smtp_server}:{self.smtp_port}')
+            params = {
+                "from": self.from_email,
+                "to": [to_email],
+                "subject": subject,
+            }
             
-            server = smtplib.SMTP(self.smtp_server, self.smtp_port)
-            # server.set_debuglevel(1)  # Removed for security - use logging instead
-            server.starttls()
-            logger.debug('TLS started successfully')
-            server.login(self.smtp_username, self.smtp_password)
-            logger.debug('SMTP login successful')
-            text = msg.as_string()
-            server.sendmail(self.from_email, to_email, text)
-            logger.info('Email sent successfully')
-            server.quit()
+            if is_html:
+                params["html"] = body
+            else:
+                params["text"] = body
             
+            response = resend.Emails.send(params)
+            
+            logger.info(f'Email sent successfully via Resend. ID: {response.get("id")}')
             return True
+            
         except Exception as e:
-            logger.error(f'Failed to send email: {str(e)}')
+            logger.error(f'Failed to send email via Resend: {str(e)}')
             logger.error(f'Error type: {type(e).__name__}')
             return False
     

@@ -1,0 +1,22 @@
+# ========================================
+# RENDER ENVIRONMENT VARIABLES
+# Copy these into Render Dashboard → Environment
+# ========================================
+
+FLASK_SECRET_KEY=a3f9d8e2b7c4a1e5f6d9c8b7a4e2f1d8c9b6a5e4f3d2c1b8a7e6f5d4c3b2a1e9
+FLASK_DEBUG=False
+JWT_SECRET=637080282fa4fc1928bb55ee69a76daeee38ace7dcc93716f239df9ea875f80f3e26bf692c64baff8dc5c565572257d1e895e4f573df8c4542d4a8eab877f307
+DATABASE_URL=postgresql://neondb_owner:npg_HbKBatvME4L2@ep-restless-morning-a120osa5-pooler.ap-southeast-1.aws.neon.tech/neondb
+ENCRYPTION_KEY=Mrr8gf4cHmJKRxcl9TOaWBXidScPuMAPRgwJFzOOKk4=
+
+# Resend Email API
+RESEND_API_KEY=re_TwXxkB5f_8UrW8z4EgC8JFzJrunY6XAEp
+FROM_EMAIL=ddeathgod20@gmail.com
+
+# App URL (UPDATE THIS after deployment with actual Render URL)
+APP_URL=https://securevaultpro.onrender.com
+
+# Production Security Settings
+SESSION_COOKIE_SECURE=True
+FORCE_HTTPS=True
+STRICT_TRANSPORT_SECURITY=True
