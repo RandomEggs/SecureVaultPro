@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy - SecureVault Pro{% endblock %}
+
+{% block content %}
+<div class="privacy-container">
+    <div class="privacy-card">
+        <!-- Header -->
+        <div class="privacy-header">
+            <div class="logo-circle">
+                <i class="fas fa-user-secret"></i>
+            </div>
+            <h1 class="privacy-title">Privacy Policy</h1>
+            <p class="privacy-subtitle">Last updated: November 15, 2024</p>
+        </div>
+
+        <!-- Introduction -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-shield-alt me-2"></i>Our Commitment to Privacy</h2>
+            <p>At SecureVault Pro, your privacy is our highest priority. We are committed to protecting your personal information and maintaining your trust. This Privacy Policy explains how we collect, use, and safeguard your information when you use our password management service.</p>
+        </div>
+
+        <!-- Information We Collect -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-database me-2"></i>Information We Collect</h2>
+            <p>We collect minimal information necessary to provide our service:</p>
+            
+            <h3>Account Information</h3>
+            <ul>
+                <li>Email address for account creation and communication</li>
+                <li>Username (optional) for personalization</li>
+                <li>Account creation date and last login information</li>
+                <li>Subscription status and billing information (for premium plans)</li>
+            </ul>
+
+            <h3>Usage Data</h3>
+            <ul>
+                <li>Service access logs for security monitoring</li>
+                <li>Device information for compatibility optimization</li>
+                <li>Feature usage statistics for service improvement</li>
+                <li>Performance metrics and error reports</li>
+            </ul>
+
+            <h3>What We Don't Collect</h3>
+            <ul>
+                <li><strong>Your master password</strong> - Never stored or transmitted</li>
+                <li><strong>Your encrypted passwords</strong> - Cannot be accessed by us</li>
+                <li><strong>Personal files or documents</strong> - Only password data is stored</li>
+                <li><strong>Sensitive personal information</strong> beyond what's necessary</li>
+            </ul>
+        </div>
+
+        <!-- Zero-Knowledge Architecture -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-lock me-2"></i>Zero-Knowledge Architecture</h2>
+            <p>SecureVault Pro operates on a zero-knowledge principle:</p>
+            <ul>
+                <li><strong>End-to-End Encryption:</strong> Your data is encrypted locally on your device before transmission</li>
+                <li><strong>Master Password Privacy:</strong> We never have access to your master password</li>
+                <li><strong>No Data Access:</strong> We cannot read, access, or recover your encrypted data</li>
+                <li><strong>Client-Side Decryption:</strong> Data is only decrypted on your authorized devices</li>
+            </ul>
+            <p><strong>Important:</strong> Because of our zero-knowledge architecture, if you forget your master password, we cannot recover your data. This is a security feature that ensures your privacy.</p>
+        </div>
+
+        <!-- How We Use Your Information -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-cogs me-2"></i>How We Use Your Information</h2>
+            <p>We use your information solely for:</p>
+            <ul>
+                <li>Providing and maintaining our password management service</li>
+                <li>Processing subscription payments and managing your account</li>
+                <li>Sending important service notifications and security alerts</li>
+                <li>Responding to your support requests and inquiries</li>
+                <li>Analyzing usage patterns to improve our service</li>
+                <li>Ensuring platform security and preventing fraud</li>
+                <li>Complying with legal obligations and protecting our rights</li>
+            </ul>
+        </div>
+
+        <!-- Data Storage and Security -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-server me-2"></i>Data Storage and Security</h2>
+            <p>Your data security is implemented through multiple layers:</p>
+            
+            <h3>Encryption Standards</h3>
+            <ul>
+                <li>AES-256 encryption for stored data</li>
+                <li>SSL/TLS encryption for data transmission</li>
+                <li>Argon2 key derivation for master password hashing</li>
+                <li>Regular encryption key rotation</li>
+            </ul>
+
+            <h3>Storage Infrastructure</h3>
+            <ul>
+                <li>Secure cloud storage with redundancy</li>
+                <li>Geographically distributed data centers</li>
+                <li>Regular automated backups</li>
+                <li>Physical security at data facilities</li>
+            </ul>
+
+            <h3>Access Controls</h3>
+            <ul>
+                <li>Strict employee access limitations</li>
+                <li>Multi-factor authentication for staff</li>
+                <li>Audit logging for all system access</li>
+                <li>Regular security assessments</li>
+            </ul>
+        </div>
+
+        <!-- Data Sharing and Disclosure -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-share-alt me-2"></i>Data Sharing and Disclosure</h2>
+            <p>We do not sell, rent, or share your personal information with third parties for marketing purposes. We may share information only in the following circumstances:</p>
+            
+            <h3>Service Providers</h3>
+            <ul>
+                <li>Payment processors for subscription billing</li>
+                <li>Cloud infrastructure providers for data storage</li>
+                <li>Security services for fraud prevention</li>
+                <li>All providers are contractually bound to protect your data</li>
+            </ul>
+
+            <h3>Legal Requirements</h3>
+            <ul>
+                <li>When required by law, court order, or government regulation</li>
+                <li>To protect our rights, property, or safety</li>
+                <li>To prevent fraud or illegal activity</li>
+                <li>In emergency situations to protect personal safety</li>
+            </ul>
+        </div>
+
+        <!-- Your Rights and Choices -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-user-cog me-2"></i>Your Rights and Choices</h2>
+            <p>You have the following rights regarding your data:</p>
+            <ul>
+                <li><strong>Access:</strong> View and export your stored password data at any time</li>
+                <li><strong>Correction:</strong> Update your account information and email preferences</li>
+                <li><strong>Deletion:</strong> Delete your account and all associated data permanently</li>
+                <li><strong>Portability:</strong> Export your data in various formats for migration</li>
+                <li><strong>Opt-out:</strong> Unsubscribe from marketing communications at any time</li>
+                <li><strong>Security:</strong> Enable two-factor authentication for enhanced protection</li>
+            </ul>
+        </div>
+
+        <!-- Cookies and Tracking -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-cookie me-2"></i>Cookies and Tracking</h2>
+            <p>We use minimal cookies and tracking technologies:</p>
+            
+            <h3>Essential Cookies</h3>
+            <ul>
+                <li>Session management for secure login</li>
+                <li>Security token storage</li>
+                <li>Service functionality and preferences</li>
+            </ul>
+
+            <h3>Analytics Cookies</h3>
+            <ul>
+                <li>Anonymous usage statistics</li>
+                <li>Performance monitoring</li>
+                <li>Error tracking and debugging</li>
+            </ul>
+            <p>You can control cookie settings through your browser preferences.</p>
+        </div>
+
+        <!-- Data Retention -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-clock me-2"></i>Data Retention</h2>
+            <p>We retain your information as follows:</p>
+            <ul>
+                <li><strong>Account Data:</strong> Retained until you delete your account</li>
+                <li><strong>Encrypted Passwords:</strong> Stored until account deletion</li>
+                <li><strong>Usage Logs:</strong> Retained for 90 days for security purposes</li>
+                <li><strong>Payment Records:</strong> Retained for 7 years as required by law</li>
+                <li><strong>Deleted Data:</strong> Permanently erased within 30 days of deletion</li>
+            </ul>
+        </div>
+
+        <!-- International Data Transfers -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-globe me-2"></i>International Data Transfers</h2>
+            <p>Your data may be stored and processed in data centers located outside your country. We ensure:</p>
+            <ul>
+                <li>Adequate data protection standards in all jurisdictions</li>
+                <li>Compliance with international data transfer regulations</li>
+                <li>Standard contractual clauses with service providers</li>
+                <li>EU-US Privacy Shield framework participation (where applicable)</li>
+            </ul>
+        </div>
+
+        <!-- Children's Privacy -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-child me-2"></i>Children's Privacy</h2>
+            <p>SecureVault Pro is not intended for children under 18 years of age. We do not knowingly collect personal information from children. If we become aware that we have collected information from a child under 18, we will take steps to delete such information immediately.</p>
+        </div>
+
+        <!-- Changes to Privacy Policy -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-edit me-2"></i>Changes to Privacy Policy</h2>
+            <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated revision date. We will notify users of significant changes via email or through our service. Your continued use of SecureVault Pro after such changes constitutes acceptance of the updated policy.</p>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="privacy-section">
+            <h2><i class="fas fa-envelope me-2"></i>Contact Information</h2>
+            <p>If you have questions about this Privacy Policy or our data practices, please contact us:</p>
+            <ul>
+                <li>Email: privacy@securevaultpro.com</li>
+                <li>Support: support@securevaultpro.com</li>
+                <li>Website: www.securevaultpro.com</li>
+                <li>Mail: SecureVault Pro Privacy Team, [Address]</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="privacy-footer">
+            <p>&copy; 2025 SecureVault Pro. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="{{ url_for('terms') }}">Terms and Conditions</a>
+                <a href="{{ url_for('login') }}">Back to Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Privacy Page Styles */
+.privacy-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    padding: 2rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.privacy-card {
+    background: rgba(30, 30, 40, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(139, 69, 193, 0.2);
+    border-radius: 24px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 900px;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 100px rgba(139, 69, 193, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.privacy-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(139, 69, 193, 0.5), transparent);
+}
+
+.privacy-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(139, 69, 193, 0.2);
+}
+
+.logo-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #6b0f8a, #8e44ad);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    box-shadow: 
+        0 10px 30px rgba(139, 69, 193, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.logo-circle i {
+    font-size: 2rem;
+    color: white;
+}
+
+.privacy-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #ffffff, #e0e0e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.privacy-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.privacy-section {
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 16px;
+    border: 1px solid rgba(139, 69, 193, 0.1);
+    transition: all 0.3s ease;
+}
+
+.privacy-section:hover {
+    border-color: rgba(139, 69, 193, 0.3);
+    box-shadow: 0 8px 25px rgba(139, 69, 193, 0.05);
+}
+
+.privacy-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #8e44ad;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.privacy-section h2 i {
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+}
+
+.privacy-section h3 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 1.5rem 0 0.75rem 0;
+}
+
+.privacy-section p {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.privacy-section ul, .privacy-section ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.privacy-section li {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+.privacy-section strong {
+    color: #8e44ad;
+    font-weight: 600;
+}
+
+.privacy-footer {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(139, 69, 193, 0.2);
+    margin-top: 3rem;
+}
+
+.privacy-footer p {
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1rem;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.footer-links a {
+    color: #8e44ad;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.footer-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #8e44ad;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.footer-links a:hover::after {
+    transform: scaleX(1);
+}
+
+.footer-links a:hover {
+    color: #9b59b6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .privacy-container {
+        padding: 1rem;
+    }
+    
+    .privacy-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .privacy-title {
+        font-size: 2rem;
+    }
+    
+    .privacy-section {
+        padding: 1rem;
+    }
+    
+    .privacy-section h2 {
+        font-size: 1.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .privacy-container {
+        background: white;
+        padding: 0;
+    }
+    
+    .privacy-card {
+        background: white;
+        border: none;
+        box-shadow: none;
+        padding: 1rem;
+    }
+    
+    .privacy-title,
+    .privacy-section h2,
+    .privacy-section h3 {
+        color: #333;
+        -webkit-text-fill-color: #333;
+    }
+    
+    .privacy-section p,
+    .privacy-section li {
+        color: #666;
+    }
+    
+    .privacy-footer {
+        border-top: 1px solid #ccc;
+    }
+    
+    .footer-links a {
+        color: #8e44ad;
+    }
+}
+</style>
+{% endblock %}

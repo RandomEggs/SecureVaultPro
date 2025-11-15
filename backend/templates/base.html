@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SecureVault Pro - Password Manager{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --kali-purple: #6b0f8a;
+            --kali-dark-purple: #4a0763;
+            --kali-light-purple: #8e44ad;
+            --kali-accent: #9b59b6;
+            --kali-bg-dark: #1a1a1a;
+            --kali-bg-darker: #0d0d0d;
+            --kali-card-bg: #2a2a2a;
+            --kali-text-primary: #ffffff;
+            --kali-text-secondary: #b8b8b8;
+            --kali-border: #404040;
+            --kali-success: #27ae60;
+            --kali-danger: #e74c3c;
+            --kali-warning: #f39c12;
+            --kali-info: #3498db;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--kali-bg-darker) 0%, var(--kali-bg-dark) 100%);
+            color: var(--kali-text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--kali-bg-darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--kali-purple);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--kali-light-purple);
+        }
+
+        /* Auth Container */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: 
+                linear-gradient(135deg, #6b0f8a 0%, #4a0763 25%, #8e44ad 50%, #663399 75%, #4a0763 100%),
+                radial-gradient(ellipse at top left, rgba(139, 69, 193, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(107, 15, 138, 0.3) 0%, transparent 50%);
+            background-blend-mode: multiply, screen, overlay;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(139, 69, 193, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(107, 15, 138, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(155, 89, 182, 0.1) 0%, transparent 50%),
+                linear-gradient(45deg, transparent 30%, rgba(107, 15, 138, 0.05) 50%, transparent 70%);
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-100px, -100px) rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .auth-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(155, 89, 182, 0.2) 0%, transparent 2%),
+                radial-gradient(circle at 75% 75%, rgba(139, 69, 193, 0.2) 0%, transparent 2%),
+                radial-gradient(circle at 50% 10%, rgba(107, 15, 138, 0.15) 0%, transparent 1.5%),
+                radial-gradient(circle at 10% 90%, rgba(155, 89, 182, 0.15) 0%, transparent 1.5%),
+                radial-gradient(circle at 90% 10%, rgba(139, 69, 193, 0.1) 0%, transparent 1%),
+                radial-gradient(circle at 10% 50%, rgba(155, 89, 182, 0.1) 0%, transparent 1%);
+            background-size: 300px 300px, 400px 400px, 250px 250px, 350px 350px, 200px 200px, 280px 280px;
+            animation: pulse 4s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        .auth-card {
+            background: rgba(42, 42, 42, 0.95);
+            border: 1px solid rgba(139, 69, 193, 0.3);
+            border-radius: 20px;
+            box-shadow: 
+                0 20px 60px rgba(107, 15, 138, 0.4), 
+                0 0 100px rgba(139, 69, 193, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 25px 70px rgba(107, 15, 138, 0.5), 
+                0 0 120px rgba(139, 69, 193, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--kali-bg-darker) 0%, var(--kali-bg-dark) 100%);
+            border-right: 1px solid var(--kali-border);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(107, 15, 138, 0.1) 50%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .sidebar-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--kali-border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar-header i {
+            font-size: 2.5rem;
+            color: var(--kali-purple);
+            text-shadow: 0 0 20px rgba(107, 15, 138, 0.5);
+        }
+
+        .sidebar-header h5 {
+            color: var(--kali-text-primary);
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-header small {
+            color: var(--kali-text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar-nav a {
+            color: var(--kali-text-secondary);
+            text-decoration: none;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            margin: 0.25rem 0;
+        }
+
+        .sidebar-nav a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--kali-purple);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: rgba(107, 15, 138, 0.2);
+            color: var(--kali-text-primary);
+            transform: translateX(5px);
+        }
+
+        .sidebar-nav a:hover::before,
+        .sidebar-nav a.active::before {
+            transform: translateX(0);
+        }
+
+        .sidebar-nav i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--kali-border);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--kali-bg-dark);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--kali-bg-darker) 0%, var(--kali-bg-dark) 100%);
+            border-bottom: 1px solid var(--kali-border);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem;
+            background: var(--kali-bg-dark);
+            overflow-y: auto;
+        }
+
+        /* Cards */
+        .password-card {
+            background: var(--kali-card-bg);
+            border: 1px solid var(--kali-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .password-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(107, 15, 138, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .password-card:hover::before {
+            left: 100%;
+        }
+
+        .password-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(107, 15, 138, 0.3);
+            border-color: var(--kali-purple);
+        }
+
+        .stats-card {
+            background: var(--kali-card-bg);
+            border: 1px solid var(--kali-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(107, 15, 138, 0.3);
+            border-color: var(--kali-purple);
+        }
+
+        .stats-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Buttons */
+        .btn-kali {
+            background: linear-gradient(135deg, var(--kali-purple) 0%, var(--kali-light-purple) 100%);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-kali::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-kali:hover::before {
+            left: 100%;
+        }
+
+        .btn-kali:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(107, 15, 138, 0.4);
+        }
+
+        .btn-outline-kali {
+            background: transparent;
+            border: 2px solid var(--kali-purple);
+            color: var(--kali-purple);
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-kali:hover {
+            background: var(--kali-purple);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(107, 15, 138, 0.4);
+        }
+
+        /* Forms */
+        .form-control {
+            background: var(--kali-card-bg);
+            border: 1px solid var(--kali-border);
+            color: var(--kali-text-primary);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: var(--kali-card-bg);
+            border-color: var(--kali-purple);
+            color: var(--kali-text-primary);
+            box-shadow: 0 0 0 3px rgba(107, 15, 138, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: var(--kali-text-secondary);
+        }
+
+        .form-label {
+            color: var(--kali-text-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Modal */
+        .modal-content {
+            background: var(--kali-card-bg);
+            border: 1px solid var(--kali-border);
+            border-radius: 20px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--kali-border);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--kali-border);
+        }
+
+        .modal-title {
+            color: var(--kali-text-primary);
+        }
+
+        /* Table */
+        .table {
+            color: var(--kali-text-primary);
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--kali-purple);
+            color: var(--kali-text-primary);
+            font-weight: 600;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid var(--kali-border);
+            transition: background-color 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(107, 15, 138, 0.1);
+        }
+
+        /* Alert */
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .alert-success {
+            background: rgba(39, 174, 96, 0.2);
+            color: var(--kali-success);
+        }
+
+        .alert-danger {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--kali-danger);
+        }
+
+        /* Password strength indicator */
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak { 
+            background: var(--kali-danger); 
+            width: 33%;
+        }
+        .strength-medium { 
+            background: var(--kali-warning); 
+            width: 66%;
+        }
+        .strength-strong { 
+            background: var(--kali-success); 
+            width: 100%;
+        }
+
+        /* Glow effects */
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(107, 15, 138, 0.5);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Footer */
+        .main-footer {
+            background: rgba(26, 26, 26, 0.95);
+            border-top: 1px solid var(--kali-border);
+            padding: 2rem 0;
+            margin-top: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--kali-text-primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .footer-brand i {
+            color: var(--kali-light-purple);
+            font-size: 1.25rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--kali-light-purple);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .footer-links a:hover::after {
+            transform: scaleX(1);
+        }
+
+        .footer-links a:hover {
+            color: var(--kali-light-purple);
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+            
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+    
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <a href="{{ url_for('login') }}" class="footer-brand">
+                <i class="fas fa-shield-alt"></i>
+                SecureVault Pro
+            </a>
+            
+            <div class="footer-links">
+                <a href="{{ url_for('terms') }}">Terms and Conditions</a>
+                <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+                <a href="mailto:support@securevaultpro.com">Contact Support</a>
+            </div>
+            
+            <div class="footer-copyright">
+                &copy; 2025 SecureVault Pro. All rights reserved.
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

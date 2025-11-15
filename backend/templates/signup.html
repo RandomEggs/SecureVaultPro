@@ -1,0 +1,657 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - SecureVault Pro{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card-modern">
+        <!-- Modern Header -->
+        <div class="auth-header-modern">
+            <div class="logo-container">
+                <div class="logo-circle">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+            </div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join SecureVault Pro and secure your digital life</p>
+        </div>
+        
+        <!-- Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert-modern alert-{{ 'danger' if category == 'error' else 'success' }}">
+                        <div class="alert-content">
+                            <i class="fas fa-{{ 'exclamation-circle' if category == 'error' else 'check-circle' }} alert-icon"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                        <button class="alert-close" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Modern Form -->
+        <form class="auth-form-modern" method="POST" action="{{ url_for('signup') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group-modern">
+                <label class="form-label-modern">Email Address</label>
+                <div class="input-wrapper-modern">
+                    <div class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <input type="email" class="form-input-modern" id="email" name="email" required placeholder="Enter your email">
+                    <div class="input-border"></div>
+                </div>
+            </div>
+            
+            <div class="form-group-modern">
+                <label class="form-label-modern">Password</label>
+                <div class="input-wrapper-modern">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <input type="password" class="form-input-modern" id="password" name="password" required placeholder="Create a strong password">
+                    <button type="button" class="password-toggle" id="togglePassword">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <div class="input-border"></div>
+                </div>
+                <div class="password-strength-meter">
+                    <div class="password-strength-bar" id="passwordStrength"></div>
+                </div>
+                <div class="password-hint" id="passwordHint">Use 8+ characters with mixed case and numbers</div>
+            </div>
+            
+            <div class="form-group-modern">
+                <label class="form-label-modern">Confirm Password</label>
+                <div class="input-wrapper-modern">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <input type="password" class="form-input-modern" id="confirmPassword" name="confirmPassword" required placeholder="Confirm your password">
+                    <div class="input-border"></div>
+                </div>
+            </div>
+            
+            <div class="form-options-modern">
+                <label class="checkbox-modern">
+                    <input type="checkbox" id="terms" required>
+                    <span class="checkbox-checkmark"></span>
+                    <span class="checkbox-label">I agree to the <a href="{{ url_for('terms') }}" class="link-modern" target="_blank" rel="noopener noreferrer">Terms and Conditions</a></span>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn-primary-modern">
+                <span class="btn-text">Create Account</span>
+                <i class="fas fa-user-plus btn-icon"></i>
+            </button>
+        </form>
+        
+        <!-- Modern Footer -->
+        <div class="auth-footer-modern">
+            <div class="divider-modern">
+                <span>or</span>
+            </div>
+            
+            <div class="auth-links-modern">
+                <p class="auth-link-text">
+                    Already have an account? 
+                    <a href="{{ url_for('login') }}" class="link-modern">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Modern Auth Styles */
+.auth-card-modern {
+    background: rgba(30, 30, 40, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(139, 69, 193, 0.2);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 100px rgba(139, 69, 193, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-card-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(139, 69, 193, 0.5), transparent);
+}
+
+.auth-header-modern {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.logo-container {
+    margin-bottom: 1.5rem;
+}
+
+.logo-circle {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #6b0f8a, #8e44ad);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0 10px 30px rgba(139, 69, 193, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+}
+
+.logo-circle::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, #6b0f8a, #8e44ad, #6b0f8a);
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0.5;
+    filter: blur(10px);
+}
+
+.logo-circle i {
+    font-size: 2rem;
+    color: white;
+}
+
+.auth-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #ffffff, #e0e0e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.auth-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Modern Alerts */
+.alert-modern {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(10px);
+}
+
+.alert-success {
+    border-color: rgba(39, 174, 96, 0.3);
+    background: rgba(39, 174, 96, 0.1);
+}
+
+.alert-danger {
+    border-color: rgba(231, 76, 60, 0.3);
+    background: rgba(231, 76, 60, 0.1);
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert-icon {
+    font-size: 1.1rem;
+}
+
+.alert-success .alert-icon {
+    color: #27ae60;
+}
+
+.alert-danger .alert-icon {
+    color: #e74c3c;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.alert-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Modern Form */
+.auth-form-modern {
+    margin-bottom: 2rem;
+}
+
+.form-group-modern {
+    margin-bottom: 1.75rem;
+}
+
+.form-label-modern {
+    display: block;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}
+
+.input-wrapper-modern {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.form-input-modern {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.form-input-modern::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.form-input-modern:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(139, 69, 193, 0.5);
+    box-shadow: 0 0 0 3px rgba(139, 69, 193, 0.1);
+}
+
+.form-input-modern:focus + .password-toggle {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.password-toggle {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.password-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.input-border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #6b0f8a, #8e44ad);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.form-input-modern:focus ~ .input-border {
+    transform: scaleX(1);
+}
+
+/* Password Strength Meter */
+.password-strength-meter {
+    margin-top: 0.5rem;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.strength-weak {
+    background: linear-gradient(90deg, #e74c3c, #c0392b);
+    width: 33%;
+}
+
+.strength-medium {
+    background: linear-gradient(90deg, #f39c12, #e67e22);
+    width: 66%;
+}
+
+.strength-strong {
+    background: linear-gradient(90deg, #27ae60, #2ecc71);
+    width: 100%;
+}
+
+.password-hint {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    text-align: right;
+}
+
+.text-danger {
+    color: #e74c3c;
+}
+
+.text-warning {
+    color: #f39c12;
+}
+
+.text-success {
+    color: #27ae60;
+}
+
+/* Modern Checkbox */
+.form-options-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.checkbox-modern {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.checkbox-modern input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.checkbox-modern input[type="checkbox"]:checked ~ .checkbox-checkmark {
+    background: linear-gradient(135deg, #6b0f8a, #8e44ad);
+    border-color: #6b0f8a;
+}
+
+.checkbox-modern input[type="checkbox"]:checked ~ .checkbox-checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.checkbox-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+/* Modern Buttons */
+.btn-primary-modern {
+    width: 100%;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #6b0f8a, #8e44ad);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-primary-modern:hover::before {
+    left: 100%;
+}
+
+.btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(139, 69, 193, 0.4);
+}
+
+/* Modern Footer */
+.auth-footer-modern {
+    text-align: center;
+}
+
+.divider-modern {
+    position: relative;
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.divider-modern::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.divider-modern span {
+    background: rgba(30, 30, 40, 0.95);
+    padding: 0 1rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+}
+
+.auth-links-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.auth-link-text {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.link-modern {
+    color: #8e44ad;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.link-modern::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #8e44ad;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.link-modern:hover::after {
+    transform: scaleX(1);
+}
+
+.link-modern:hover {
+    color: #9b59b6;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .auth-card-modern {
+        margin: 1rem;
+        padding: 2rem 1.5rem;
+    }
+    
+    .auth-title {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+<script>
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('password');
+    const icon = this.querySelector('i');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+});
+
+document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('confirmPassword');
+    const icon = this.querySelector('i');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+});
+
+function checkPasswordStrength(password) {
+    let strength = 0;
+    const strengthBar = document.getElementById('passwordStrength');
+    const hint = document.getElementById('passwordHint');
+    
+    if (password.length >= 8) strength++;
+    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+    if (password.match(/[0-9]/)) strength++;
+    if (password.match(/[^a-zA-Z0-9]/)) strength++;
+    
+    strengthBar.className = 'password-strength-bar';
+    
+    if (strength <= 1) {
+        strengthBar.classList.add('strength-weak');
+        hint.textContent = 'Weak password - add more characters';
+        hint.className = 'password-hint text-danger';
+    } else if (strength === 2) {
+        strengthBar.classList.add('strength-medium');
+        hint.textContent = 'Medium strength - add numbers or symbols';
+        hint.className = 'password-hint text-warning';
+    } else {
+        strengthBar.classList.add('strength-strong');
+        hint.textContent = 'Strong password!';
+        hint.className = 'password-hint text-success';
+    }
+}
+
+document.getElementById('password').addEventListener('input', function() {
+    checkPasswordStrength(this.value);
+});
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        
+        // Create modern error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert-modern alert-danger';
+        errorDiv.innerHTML = `
+            <div class="alert-content">
+                <i class="fas fa-exclamation-circle alert-icon"></i>
+                <span>Passwords do not match!</span>
+            </div>
+            <button class="alert-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        // Insert at the top of the form
+        this.insertBefore(errorDiv, this.firstChild);
+        
+        // Scroll to top
+        errorDiv.scrollIntoView({ behavior: 'smooth' });
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (errorDiv.parentElement) {
+                errorDiv.remove();
+            }
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Setup Two-Factor Authentication - SecureVault Pro{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            <i class="fas fa-shield-alt fa-3x mb-3" style="color: var(--kali-primary);"></i>
+            <h2 class="text-white">Two-Factor Authentication</h2>
+            <p class="text-secondary">
+                {% if mfa and mfa.is_enabled %}
+                Disable 2FA for your account
+                {% else %}
+                Enable an extra layer of security
+                {% endif %}
+            </p>
+        </div>
+
+        {% if mfa and mfa.is_enabled %}
+        <!-- Disable 2FA Form -->
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Warning:</strong> Disabling 2FA will make your account less secure.
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label text-secondary">2FA Status</label>
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <span class="text-success">2FA is currently enabled</span>
+                </div>
+                <small class="text-secondary">
+                    Last used: {{ mfa.last_used.strftime('%Y-%m-%d %H:%M') if mfa.last_used else 'Never' }}<br>
+                    Usage count: {{ mfa.usage_count }}
+                </small>
+            </div>
+            
+            <button type="submit" class="btn btn-danger w-100">
+                <i class="fas fa-times me-2"></i>Disable 2FA
+            </button>
+        </form>
+
+        {% else %}
+        <!-- Enable 2FA Form -->
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="mb-4">
+                <label class="form-label text-secondary">Step 1: Scan QR Code</label>
+                <div class="text-center mb-3">
+                    <img src="{{ mfa.generate_qr_code(user.email) }}" alt="QR Code" class="img-fluid border rounded" style="max-width: 200px; background: white;">
+                </div>
+                <p class="text-secondary small">
+                    Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-secondary">Or enter manually:</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" value="{{ mfa.secret }}" readonly>
+                    <button class="btn btn-outline-secondary" type="button" onclick="copySecret()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-secondary">Step 2: Enter Verification Code</label>
+                <input type="text" name="token" class="form-control" placeholder="Enter 6-digit code" maxlength="6" pattern="\d{6}" required>
+                <div class="form-text text-secondary">
+                    Enter the 6-digit code from your authenticator app
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-secondary">Backup Codes</label>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Save these backup codes in a safe place. You can use them if you lose access to your authenticator app.
+                </div>
+                <!-- Hidden data element for JavaScript -->
+                <div id="backupCodesData" data-codes="{{ mfa.backup_codes|join(',') }}" style="display: none;"></div>
+                <div class="row">
+                    {% for code in mfa.backup_codes %}
+                    <div class="col-6 mb-2">
+                        <code class="d-block p-2 bg-dark text-light rounded text-center">{{ code }}</code>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" onclick="downloadBackupCodes()">
+                    <i class="fas fa-download me-1"></i>Download Backup Codes
+                </button>
+            </div>
+
+            <button type="submit" class="btn btn-kali w-100">
+                <i class="fas fa-shield-alt me-2"></i>Enable 2FA
+            </button>
+        </form>
+        {% endif %}
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('dashboard') }}" class="text-decoration-none text-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function copySecret() {
+    const secret = '{{ mfa.secret }}';
+    navigator.clipboard.writeText(secret).then(() => {
+        showNotification('Secret copied to clipboard!', 'success');
+    });
+}
+
+function downloadBackupCodes() {
+    // Get backup codes from the hidden data attribute
+    const codesData = document.getElementById('backupCodesData').getAttribute('data-codes');
+    const codes = codesData ? codesData.split(',') : [];
+    
+    const text = `SecureVault Pro - 2FA Backup Codes\n\n` +
+                `Generated: ${new Date().toLocaleString()}\n` +
+                `User: {{ user.email }}\n\n` +
+                `Backup Codes:\n${codes.join('\n')}\n\n` +
+                `Keep these codes safe and private!`;
+    
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'securevault-pro-backup-codes.txt';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    showNotification('Backup codes downloaded!', 'success');
+}
+
+function showNotification(message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+    notification.style.zIndex = '9999';
+    notification.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-${type === 'success' ? 'check' : 'info'}-circle me-2"></i>
+            ${message}
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

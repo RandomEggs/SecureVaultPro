@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Two-Factor Authentication - SecureVault Pro{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            <i class="fas fa-shield-alt fa-3x mb-3" style="color: var(--kali-primary);"></i>
+            <h2 class="text-white">Two-Factor Authentication</h2>
+            <p class="text-secondary">Enter your verification code to continue</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info' }}-circle me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- TOTP Verification Form -->
+        <form method="POST" id="totpForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="mb-4">
+                <label class="form-label text-secondary">
+                    <i class="fas fa-mobile-alt me-2"></i>Authenticator App Code
+                </label>
+                <input type="text" name="token" class="form-control form-control-lg text-center" 
+                       placeholder="000000" maxlength="6" pattern="\d{6}" required
+                       autocomplete="one-time-code" autofocus>
+                <div class="form-text text-secondary">
+                    Enter the 6-digit code from your authenticator app
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-kali btn-lg w-100 mb-3">
+                <i class="fas fa-sign-in-alt me-2"></i>Verify & Login
+            </button>
+        </form>
+
+        <div class="text-center mb-3">
+            <span class="text-secondary">or</span>
+        </div>
+
+        <!-- Backup Code Form -->
+        <button class="btn btn-outline-secondary w-100 mb-3" onclick="showBackupCodeForm()">
+            <i class="fas fa-key me-2"></i>Use Backup Code
+        </button>
+
+        <!-- Backup Code Form (Hidden by default) -->
+        <form method="POST" id="backupForm" style="display: none;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="mb-4">
+                <label class="form-label text-secondary">
+                    <i class="fas fa-key me-2"></i>Backup Code
+                </label>
+                <input type="text" name="backup_code" class="form-control form-control-lg text-center" 
+                       placeholder="XXXXXXXX" maxlength="8" pattern="[A-Z0-9]{8}" required
+                       style="text-transform: uppercase;">
+                <div class="form-text text-secondary">
+                    Enter one of your 8-character backup codes
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-warning btn-lg w-100 mb-2">
+                <i class="fas fa-key me-2"></i>Use Backup Code
+            </button>
+            
+            <button type="button" class="btn btn-outline-secondary w-100" onclick="hideBackupCodeForm()">
+                <i class="fas fa-arrow-left me-2"></i>Back to Authenticator Code
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('login') }}" class="text-decoration-none text-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Login
+            </a>
+        </div>
+
+        <hr class="my-4" style="border-color: var(--kali-border);">
+        
+        <div class="text-center">
+            <h6 class="text-secondary mb-3">Need Help?</h6>
+            <div class="row text-start">
+                <div class="col-12 mb-2">
+                    <small class="text-secondary">
+                        <i class="fas fa-info-circle me-2 text-info"></i>
+                        <strong>Lost your device?</strong> Use a backup code to access your account.
+                    </small>
+                </div>
+                <div class="col-12 mb-2">
+                    <small class="text-secondary">
+                        <i class="fas fa-clock me-2 text-warning"></i>
+                        <strong>Code not working?</strong> Make sure your device time is correct.
+                    </small>
+                </div>
+                <div class="col-12">
+                    <small class="text-secondary">
+                        <i class="fas fa-sync me-2 text-primary"></i>
+                        <strong>Codes refresh every 30 seconds.</strong> Wait for a new code if needed.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showBackupCodeForm() {
+    document.getElementById('totpForm').style.display = 'none';
+    document.getElementById('backupForm').style.display = 'block';
+}
+
+function hideBackupCodeForm() {
+    document.getElementById('backupForm').style.display = 'none';
+    document.getElementById('totpForm').style.display = 'block';
+}
+
+// Auto-focus and format input
+document.addEventListener('DOMContentLoaded', function() {
+    const tokenInput = document.querySelector('input[name="token"]');
+    if (tokenInput) {
+        tokenInput.focus();
+        
+        // Only allow numbers
+        tokenInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    }
+    
+    const backupInput = document.querySelector('input[name="backup_code"]');
+    if (backupInput) {
+        // Auto-format to uppercase
+        backupInput.addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+    }
+});
+</script>
+{% endblock %}

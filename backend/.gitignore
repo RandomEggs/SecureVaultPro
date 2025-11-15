@@ -1,0 +1,41 @@
+# Environment Variables - NEVER COMMIT THESE!
+.env
+.env.local
+.env.production
+.env*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*venv/
+ENV/
+env/
+
+# Database
+*.db
+*.sqlite3
+*.sql
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs - Contains sensitive information
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Security
+*.pem
+*.key
+*.crt
+secrets/
+audits/
