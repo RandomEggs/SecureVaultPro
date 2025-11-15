@@ -30,26 +30,16 @@ Base = declarative_base()
 
 @contextmanager
 def get_session():
-    """Get database session with error handling and retry logic"""
-    max_retries = 3
-    for attempt in range(max_retries):
-        db = SessionLocal()
-        try:
-            # Test the connection
-            db.execute(text("SELECT 1"))
-            yield db
-            break
-        except Exception as e:
-            db.close()
-            if attempt < max_retries - 1:
-                print(f"Database connection attempt {attempt + 1} failed, retrying... Error: {e}")
-                continue
-            else:
-                print(f"Database connection failed after {max_retries} attempts: {e}")
-                raise
-        finally:
-            if 'db' in locals():
-                db.close()
+    """Get database session with error handling"""
+    db = SessionLocal()
+    try:
+        yield db
+    except Exception as e:
+        db.rollback()
+        print(f"Database error: {e}")
+        raise
+    finally:
+        db.close()
 
 def create_tables():
     Base.metadata.create_all(bind=engine)

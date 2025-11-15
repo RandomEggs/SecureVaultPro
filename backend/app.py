@@ -672,8 +672,6 @@ def import_passwords():
                     encrypted_pwd = security.encrypt_password(pwd_data['password'])
                     existing.encrypted_password = base64.b64encode(encrypted_pwd).decode('utf-8')
                     existing.username = pwd_data['username']
-                    existing.notes = pwd_data.get('notes', '')
-                    existing.updated_at = datetime.utcnow()
                 else:
                     # Create new password entry
                     encrypted_pwd = security.encrypt_password(pwd_data['password'])
@@ -681,8 +679,7 @@ def import_passwords():
                         user_id=session['user_id'],
                         website_name=pwd_data['website_name'],
                         username=pwd_data['username'],
-                        encrypted_password=base64.b64encode(encrypted_pwd).decode('utf-8'),
-                        notes=pwd_data.get('notes', '')
+                        encrypted_password=base64.b64encode(encrypted_pwd).decode('utf-8')
                     )
                     db.add(new_password)
                     imported_count += 1
