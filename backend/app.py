@@ -657,21 +657,22 @@ def import_passwords():
                 if not all(key in pwd_data for key in ['website_name', 'username', 'password']):
                     continue
                 
-                # Check if password already exists for this user and website
+                # Check if exact same password exists (same website AND username)
                 existing = db.execute(
                     select(Password).where(
                         and_(
                             Password.user_id == session['user_id'],
-                            Password.website_name == pwd_data['website_name']
+                            Password.website_name == pwd_data['website_name'],
+                            Password.username == pwd_data['username']
                         )
                     )
-                ).scalar_one_or_none()
+                ).first()
                 
                 if existing:
                     # Update existing password
+                    existing = existing[0]  # Get the Password object from tuple
                     encrypted_pwd = security.encrypt_password(pwd_data['password'])
                     existing.encrypted_password = base64.b64encode(encrypted_pwd).decode('utf-8')
-                    existing.username = pwd_data['username']
                 else:
                     # Create new password entry
                     encrypted_pwd = security.encrypt_password(pwd_data['password'])
