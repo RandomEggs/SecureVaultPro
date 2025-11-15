@@ -50,8 +50,16 @@ class EmailService:
             return True
             
         except Exception as e:
-            logger.error(f'Failed to send email via Resend: {str(e)}')
+            error_msg = str(e)
+            logger.error(f'Failed to send email via Resend: {error_msg}')
             logger.error(f'Error type: {type(e).__name__}')
+            
+            # Log specific Resend errors
+            if "testing emails" in error_msg:
+                logger.error('⚠️ Resend is in test mode - can only send to verified email address')
+            elif "verify a domain" in error_msg:
+                logger.error('⚠️ Need to verify domain in Resend dashboard: https://resend.com/domains')
+            
             return False
     
     def send_verification_email(self, to_email, token):
@@ -92,11 +100,24 @@ class EmailService:
                 }}
                 .content {{
                     padding: 30px;
+                    color: #ffffff;
+                }}
+                .content h2 {{
+                    color: #ffffff;
+                }}
+                .content p {{
+                    color: #cccccc;
+                }}
+                .content strong {{
+                    color: #ffffff;
+                }}
+                .content em {{
+                    color: #aaaaaa;
                 }}
                 .button {{
                     display: inline-block;
                     background: linear-gradient(135deg, #6b0f8a 0%, #8e44ad 100%);
-                    color: #ffffff;
+                    color: #ffffff !important;
                     padding: 15px 30px;
                     text-decoration: none;
                     border-radius: 5px;
@@ -126,7 +147,7 @@ class EmailService:
                     </p>
                     
                     <p><strong>Or copy and paste this link:</strong></p>
-                    <p style="word-break: break-all; background-color: #1a1a1a; padding: 10px; border-radius: 5px;">{verification_url}</p>
+                    <p style="word-break: break-all; background-color: #1a1a1a; padding: 10px; border-radius: 5px; color: #8e44ad;">{verification_url}</p>
                     
                     <p><em>This link will expire in 24 hours.</em></p>
                     <p>If you didn't create an account with SecureVault Pro, please ignore this email.</p>

@@ -192,10 +192,24 @@ def signup():
                     flash('Account created successfully! Please check your email to verify your account.', 'success')
                 else:
                     app.logger.warning('Failed to send verification email')
-                    flash('Account created but verification email failed to send. Please try resending the verification email from the login page.', 'warning')
+                    # TEMPORARY: Auto-verify in development mode when email fails
+                    if os.getenv('FLASK_DEBUG', 'False').lower() == 'true':
+                        new_user.is_verified = True
+                        db.commit()
+                        app.logger.info('⚠️ DEV MODE: Auto-verified user due to email failure')
+                        flash('Account created successfully! (Email verification bypassed in dev mode)', 'success')
+                    else:
+                        flash('Account created but verification email failed to send. Please try resending the verification email from the login page.', 'warning')
             except Exception as e:
                 app.logger.error(f'Email sending error: {str(e)}')
-                flash('Account created but verification email failed. Please try resending the verification email from the login page.', 'warning')
+                # TEMPORARY: Auto-verify in development mode when email fails
+                if os.getenv('FLASK_DEBUG', 'False').lower() == 'true':
+                    new_user.is_verified = True
+                    db.commit()
+                    app.logger.info('⚠️ DEV MODE: Auto-verified user due to email failure')
+                    flash('Account created successfully! (Email verification bypassed in dev mode)', 'success')
+                else:
+                    flash('Account created but verification email failed. Please try resending the verification email from the login page.', 'warning')
 
             return redirect(url_for('login'))
     
@@ -379,10 +393,28 @@ def resend_verification():
                         flash('Verification email sent successfully! Please check your inbox.', 'success')
                     else:
                         app.logger.warning('Failed to resend verification email')
-                        flash('Failed to send verification email. Please try again later.', 'error')
+                        # TEMPORARY: Auto-verify in development mode when email fails
+                        if os.getenv('FLASK_DEBUG', 'False').lower() == 'true':
+                            user.is_email_verified = True
+                            user.email_verification_token = None
+                            user.email_verification_expires = None
+                            db.commit()
+                            app.logger.info('⚠️ DEV MODE: Auto-verified user due to email failure')
+                            flash('Account verified successfully! (Email verification bypassed in dev mode)', 'success')
+                        else:
+                            flash('Failed to send verification email. Please try again later.', 'error')
                 except Exception as e:
                     app.logger.error(f'Email sending error in resend: {str(e)}')
-                    flash('Failed to send verification email. Please try again later.', 'error')
+                    # TEMPORARY: Auto-verify in development mode when email fails
+                    if os.getenv('FLASK_DEBUG', 'False').lower() == 'true':
+                        user.is_email_verified = True
+                        user.email_verification_token = None
+                        user.email_verification_expires = None
+                        db.commit()
+                        app.logger.info('⚠️ DEV MODE: Auto-verified user due to email failure')
+                        flash('Account verified successfully! (Email verification bypassed in dev mode)', 'success')
+                    else:
+                        flash('Failed to send verification email. Please try again later.', 'error')
             elif user and user.is_email_verified:
                 app.logger.info('User already verified')
                 flash('Your email is already verified. You can log in.', 'info')
