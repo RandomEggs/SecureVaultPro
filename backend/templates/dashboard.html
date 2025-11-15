@@ -526,6 +526,25 @@
         </div>
         
         <div class="content">
+            <!-- Search Bar -->
+            <div class="row mb-4">
+                <div class="col-md-6 mx-auto">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary">
+                            <i class="fas fa-search text-secondary"></i>
+                        </span>
+                        <input type="text" 
+                               id="searchInput" 
+                               class="form-control bg-dark border-secondary text-light" 
+                               placeholder="Search by website or username..."
+                               onkeyup="searchPasswords()">
+                        <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Stats Cards -->
             <div class="row mb-4">
                 <div class="col-md-3 mb-3">
@@ -1473,6 +1492,35 @@ function validateChangePasswords() {
 // Password strength checker for change password
 $('#new_password').on('input', checkChangePasswordStrength);
 $('#confirm_new_password').on('input', validateChangePasswords);
+
+// Search functionality
+function searchPasswords() {
+    const searchTerm = $('#searchInput').val().toLowerCase().trim();
+    const passwordCards = $('.password-card');
+    
+    if (!searchTerm) {
+        // Show all passwords if search is empty
+        passwordCards.show();
+        return;
+    }
+    
+    passwordCards.each(function() {
+        const card = $(this);
+        const website = card.find('h5').text().toLowerCase();
+        const username = card.find('.text-secondary').first().text().toLowerCase();
+        
+        if (website.includes(searchTerm) || username.includes(searchTerm)) {
+            card.show();
+        } else {
+            card.hide();
+        }
+    });
+}
+
+function clearSearch() {
+    $('#searchInput').val('');
+    $('.password-card').show();
+}
 
 function showNotification(message, type) {
     const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
