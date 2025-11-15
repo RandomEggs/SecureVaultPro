@@ -1,9 +1,9 @@
 import os
 import logging
-import resend
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from pathlib import Path
+from gmail_service import gmail_service
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -13,53 +13,40 @@ load_dotenv(dotenv_path=env_path)
 
 class EmailService:
     def __init__(self):
-        # Use Resend API (works on Render - uses HTTPS, not blocked SMTP ports)
-        self.resend_api_key = os.getenv("RESEND_API_KEY")
-        self.from_email = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
-        self.app_url = os.getenv("APP_URL", "http://localhost:5000")
+        # Use Gmail API (works everywhere - no SMTP port blocking)
+        self.gmail_service = gmail_service
+        self.app_url = os.getenv('APP_URL', 'http://localhost:5000')
         
-        # Configure Resend
-        if self.resend_api_key:
-            resend.api_key = self.resend_api_key
-        else:
-            logger.warning('RESEND_API_KEY not set, email functionality disabled')
+        if not self.gmail_service.service:
+            logger.warning('Gmail API not configured, email functionality will be limited')
     
     def send_email(self, to_email: str, subject: str, body: str, is_html: bool = False):
-        """Send an email using Resend API"""
+        """Send an email using Gmail API"""
         try:
-            if not self.resend_api_key:
-                logger.warning('Resend API key not configured, email not sent')
+            if not self.gmail_service.service:
+                logger.warning('Gmail API not configured, email not sent')
                 return False
             
-            logger.info(f'Attempting to send email via Resend to {to_email}')
+            logger.info(f'Attempting to send email via Gmail API to {to_email}')
             
-            params = {
-                "from": self.from_email,
-                "to": [to_email],
-                "subject": subject,
-            }
+            # Gmail API only supports HTML, so if plain text, wrap it
+            if not is_html:
+                body = f'<html><body><pre>{body}</pre></body></html>'
             
-            if is_html:
-                params["html"] = body
+            # Send via Gmail API
+            success = self.gmail_service.send_email(to_email, subject, body)
+            
+            if success:
+                logger.info('Email sent successfully via Gmail API')
             else:
-                params["text"] = body
+                logger.error('Failed to send email via Gmail API')
             
-            response = resend.Emails.send(params)
-            
-            logger.info(f'Email sent successfully via Resend. ID: {response.get("id")}')
-            return True
+            return success
             
         except Exception as e:
             error_msg = str(e)
-            logger.error(f'Failed to send email via Resend: {error_msg}')
+            logger.error(f'Failed to send email via Gmail API: {error_msg}')
             logger.error(f'Error type: {type(e).__name__}')
-            
-            # Log specific Resend errors
-            if "testing emails" in error_msg:
-                logger.error('⚠️ Resend is in test mode - can only send to verified email address')
-            elif "verify a domain" in error_msg:
-                logger.error('⚠️ Need to verify domain in Resend dashboard: https://resend.com/domains')
-            
             return False
     
     def send_verification_email(self, to_email, token):

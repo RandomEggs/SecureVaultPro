@@ -74,6 +74,11 @@ secrets/
 audits/
 credentials/
 
+# Gmail API Credentials (NEVER COMMIT!)
+credentials.json
+token.json
+gmail_credentials.json
+
 # Test & Debug Files
 test_*.py
 *_test.py
