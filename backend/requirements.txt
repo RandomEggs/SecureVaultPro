@@ -16,3 +16,4 @@ flask-talisman
 pyotp
 qrcode
 pillow
+gunicorn
