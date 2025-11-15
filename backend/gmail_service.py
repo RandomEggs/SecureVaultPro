@@ -40,20 +40,37 @@ class GmailService:
     def _get_gmail_service(self):
         """Create and return Gmail API service with OAuth2 credentials"""
         try:
-            # Create credentials from refresh token
-            creds = Credentials(
-                token=None,
-                refresh_token=self.refresh_token,
-                token_uri='https://oauth2.googleapis.com/token',
-                client_id=self.client_id,
-                client_secret=self.client_secret,
-                scopes=['https://www.googleapis.com/auth/gmail.send']
-            )
+            creds = None
             
-            # Refresh the access token
+            # Check if token.json exists (from generate_gmail_token.py)
+            if os.path.exists('token.json'):
+                logger.debug('Loading credentials from token.json')
+                creds = Credentials.from_authorized_user_file('token.json', 
+                    scopes=['https://www.googleapis.com/auth/gmail.send'])
+            
+            # If no token.json, create from environment variables
+            if not creds:
+                logger.debug('Creating credentials from environment variables')
+                creds = Credentials(
+                    token=None,
+                    refresh_token=self.refresh_token,
+                    token_uri='https://oauth2.googleapis.com/token',
+                    client_id=self.client_id,
+                    client_secret=self.client_secret,
+                    scopes=['https://www.googleapis.com/auth/gmail.send']
+                )
+            
+            # Refresh the access token if needed
             if not creds.valid:
-                creds.refresh(Request())
-                logger.debug('Access token refreshed successfully')
+                if creds.expired and creds.refresh_token:
+                    logger.debug('Refreshing expired access token')
+                    creds.refresh(Request())
+                    logger.debug('Access token refreshed successfully')
+                    
+                    # Save updated token
+                    if os.path.exists('token.json'):
+                        with open('token.json', 'w') as token:
+                            token.write(creds.to_json())
             
             # Build Gmail API service
             service = build('gmail', 'v1', credentials=creds)
