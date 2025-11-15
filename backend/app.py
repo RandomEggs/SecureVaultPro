@@ -8,6 +8,7 @@ from email_service import email_service
 from datetime import datetime, timedelta, timezone
 import os
 import logging
+import base64
 from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
@@ -239,7 +240,7 @@ def get_passwords():
             'id': pwd.id,
             'website_name': pwd.website_name,
             'username': pwd.username,
-            'password': security.decrypt_password(pwd.encrypted_password)
+            'password': security.decrypt_password(base64.b64decode(pwd.encrypted_password))
         }
         for pwd in passwords
     ]
@@ -275,11 +276,13 @@ def create_password():
     
     with get_session() as db:
         encrypted_pwd = security.encrypt_password(data['password'])
+        # Convert bytes to base64 string for database storage
+        encrypted_pwd_str = base64.b64encode(encrypted_pwd).decode('utf-8')
         new_password = Password(
             user_id=session['user_id'],
             website_name=website_name,
             username=username,
-            encrypted_password=encrypted_pwd
+            encrypted_password=encrypted_pwd_str
         )
         db.add(new_password)
         db.commit()
@@ -320,7 +323,9 @@ def update_password(password_id):
 
         password.website_name = data['website_name'].strip()
         password.username = data['username'].strip()
-        password.encrypted_password = security.encrypt_password(data['password'])
+        encrypted_pwd = security.encrypt_password(data['password'])
+        # Convert bytes to base64 string for database storage
+        password.encrypted_password = base64.b64encode(encrypted_pwd).decode('utf-8')
         db.commit()
 
     return jsonify({'message': 'Password updated successfully'})
@@ -664,17 +669,19 @@ def import_passwords():
                 
                 if existing:
                     # Update existing password
-                    existing.encrypted_password = security.encrypt_password(pwd_data['password'])
+                    encrypted_pwd = security.encrypt_password(pwd_data['password'])
+                    existing.encrypted_password = base64.b64encode(encrypted_pwd).decode('utf-8')
                     existing.username = pwd_data['username']
                     existing.notes = pwd_data.get('notes', '')
                     existing.updated_at = datetime.utcnow()
                 else:
                     # Create new password entry
+                    encrypted_pwd = security.encrypt_password(pwd_data['password'])
                     new_password = Password(
                         user_id=session['user_id'],
                         website_name=pwd_data['website_name'],
                         username=pwd_data['username'],
-                        encrypted_password=security.encrypt_password(pwd_data['password']),
+                        encrypted_password=base64.b64encode(encrypted_pwd).decode('utf-8'),
                         notes=pwd_data.get('notes', '')
                     )
                     db.add(new_password)
