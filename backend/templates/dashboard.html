@@ -1018,14 +1018,29 @@ $(document).ready(function() {
 function loadPasswords() {
     console.log('Loading passwords...');
     
-    // Don't show loading state - go directly to result
+    // Clear existing passwords to prevent stale data
+    passwords = [];
+    
+    // Clear search field and show loading state
+    $('#searchInput').val('');
+    $('#passwordsList').html(`
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-secondary">Loading your passwords...</p>
+        </div>
+    `);
+    
+    // Add cache busting to prevent browser caching
     $.ajax({
-        url: '/api/passwords',
+        url: '/api/passwords?_=' + new Date().getTime(),
         method: 'GET',
         dataType: 'json',
+        cache: false,
         success: function(data) {
             console.log('Passwords loaded successfully:', data);
-            passwords = data;
+            passwords = data || [];
             displayPasswords();
             updateStats();
         },
@@ -1034,6 +1049,7 @@ function loadPasswords() {
             console.log('XHR status:', xhr.status);
             console.log('Response text:', xhr.responseText);
             
+            passwords = [];
             $('#passwordsList').html(`
                 <div class="text-center py-5">
                     <i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: var(--kali-danger);"></i>
@@ -1496,30 +1512,30 @@ $('#confirm_new_password').on('input', validateChangePasswords);
 // Search functionality
 function searchPasswords() {
     const searchTerm = $('#searchInput').val().toLowerCase().trim();
-    const passwordCards = $('.password-card');
+    const passwordItems = $('.password-item-modern');
     
     if (!searchTerm) {
         // Show all passwords if search is empty
-        passwordCards.show();
+        passwordItems.show();
         return;
     }
     
-    passwordCards.each(function() {
-        const card = $(this);
-        const website = card.find('h5').text().toLowerCase();
-        const username = card.find('.text-secondary').first().text().toLowerCase();
+    passwordItems.each(function() {
+        const item = $(this);
+        const website = item.find('.website-name').text().toLowerCase();
+        const username = item.find('.username-text').text().toLowerCase();
         
         if (website.includes(searchTerm) || username.includes(searchTerm)) {
-            card.show();
+            item.show();
         } else {
-            card.hide();
+            item.hide();
         }
     });
 }
 
 function clearSearch() {
     $('#searchInput').val('');
-    $('.password-card').show();
+    $('.password-item-modern').show();
 }
 
 function showNotification(message, type) {
