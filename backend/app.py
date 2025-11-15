@@ -227,6 +227,7 @@ def logout():
 
 # API Routes for Password CRUD
 @app.route('/api/passwords', methods=['GET'])
+@csrf.exempt
 @login_required
 def get_passwords():
     with get_session() as db:
@@ -246,6 +247,7 @@ def get_passwords():
     return jsonify(password_list)
 
 @app.route('/api/passwords', methods=['POST'])
+@csrf.exempt
 @login_required
 def create_password():
     data = request.get_json()
@@ -286,6 +288,7 @@ def create_password():
     return jsonify({'id': new_password.id, 'message': 'Password created successfully'})
 
 @app.route('/api/passwords/<int:password_id>', methods=['PUT'])
+@csrf.exempt
 @login_required
 def update_password(password_id):
     data = request.get_json()
@@ -323,6 +326,7 @@ def update_password(password_id):
     return jsonify({'message': 'Password updated successfully'})
 
 @app.route('/api/passwords/<int:password_id>', methods=['DELETE'])
+@csrf.exempt
 @login_required
 def delete_password(password_id):
     with get_session() as db:
@@ -612,6 +616,7 @@ def privacy():
     return render_template('privacy.html')
 
 @app.route('/api/2fa-status')
+@csrf.exempt
 @login_required
 def get_2fa_status():
     with get_session() as db:
@@ -629,6 +634,7 @@ def get_2fa_status():
             return jsonify({'enabled': False, 'verified': False})
 
 @app.route('/api/import-passwords', methods=['POST'])
+@csrf.exempt
 @login_required
 def import_passwords():
     try:
@@ -686,6 +692,7 @@ def import_passwords():
         return jsonify({'error': f'Import failed: {str(e)}'}), 500
 
 @app.route('/api/delete-account', methods=['POST'])
+@csrf.exempt
 @login_required
 def delete_account():
     try:
