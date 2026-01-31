@@ -493,7 +493,7 @@
         </div>
         
         <nav class="sidebar-nav">
-            <a href="{{ url_for('dashboard') }}" class="active">
+            <a href="#" class="active" onclick="showPasswords(); return false;">
                 <i class="fas fa-key"></i>
                 Your Passwords
             </a>
@@ -572,8 +572,8 @@
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
                         <i class="fas fa-clock" style="color: var(--kali-warning);"></i>
-                        <h3 id="recentPasswords">0</h3>
-                        <p class="mb-0">Recent Added</p>
+                        <h3 id="specialCharacterPasswords">0</h3>
+                        <p class="mb-0">Contains Symbols</p>
                     </div>
                 </div>
             </div>
@@ -819,26 +819,83 @@
             <!-- Analytics Section (Hidden by default) -->
             <div id="analyticsSection" style="display: none;">
                 <div class="password-card">
-                    <h3 class="mb-4"><i class="fas fa-chart-line me-2"></i>Analytics</h3>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5 class="mb-3 text-secondary">Password Strength Distribution</h5>
-                            <div class="progress mb-2" style="height: 25px;">
-                                <div class="progress-bar bg-danger" style="width: 20%">Weak: 20%</div>
-                                <div class="progress-bar bg-warning" style="width: 30%">Medium: 30%</div>
-                                <div class="progress-bar bg-success" style="width: 50%">Strong: 50%</div>
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+                        <div>
+                            <h3 class="mb-1"><i class="fas fa-chart-line me-2"></i>Password Intelligence</h3>
+                            <p class="text-secondary mb-0">Real-time insights based on your stored credentials</p>
+                        </div>
+                        <div class="analytics-chip">
+                            <i class="fas fa-sync"></i>
+                            Updated automatically
+                        </div>
+                    </div>
+
+                    <div id="analyticsEmptyState" class="analytics-empty-state text-center">
+                        <i class="fas fa-chart-pie fa-3x mb-3" style="color: var(--kali-text-secondary);"></i>
+                        <h4 class="mb-2">Start adding passwords to unlock analytics</h4>
+                        <p class="text-secondary mb-0">Once you save passwords, you'll see trends about strength, reuse, and security.</p>
+                    </div>
+
+                    <div id="analyticsContent" style="display: none;">
+                        <div class="row g-4 mb-4">
+                            <div class="col-lg-6">
+                                <div class="analytics-card">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h5 class="mb-1">Strength Distribution</h5>
+                                            <p class="text-secondary small mb-0">Evaluated using length and character variety</p>
+                                        </div>
+                                        <span class="analytics-badge" id="overallStrengthBadge">Balanced</span>
+                                    </div>
+                                    <div class="strength-bar mb-3">
+                                        <div class="progress h-100">
+                                            <div class="progress-bar bg-danger" id="strengthWeakBar" role="progressbar" style="width: 0%">Weak 0%</div>
+                                            <div class="progress-bar bg-warning text-dark" id="strengthMediumBar" role="progressbar" style="width: 0%">Medium 0%</div>
+                                            <div class="progress-bar bg-success" id="strengthStrongBar" role="progressbar" style="width: 0%">Strong 0%</div>
+                                        </div>
+                                    </div>
+                                    <ul class="strength-legend">
+                                        <li><span class="strength-dot" style="background: #e74c3c;"></span> <span id="weakCountLabel">Weak: 0</span></li>
+                                        <li><span class="strength-dot" style="background: #f1c40f;"></span> <span id="mediumCountLabel">Medium: 0</span></li>
+                                        <li><span class="strength-dot" style="background: #27ae60;"></span> <span id="strongCountLabel">Strong: 0</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="analytics-card">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h5 class="mb-1">Most Used Websites</h5>
+                                            <p class="text-secondary small mb-0">Spot reuse and high-value targets</p>
+                                        </div>
+                                        <span class="analytics-badge" id="uniqueWebsitesBadge">0 unique</span>
+                                    </div>
+                                    <ul class="analytics-site-list" id="topWebsitesList"></ul>
+                                    <p class="text-secondary small mb-0" id="topWebsitesSummary"></p>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <h5 class="mb-3 text-secondary">Most Used Websites</h5>
-                            <div class="list-group">
-                                <div class="list-group-item d-flex justify-content-between align-items-center" style="background: var(--kali-card-bg); border: 1px solid var(--kali-border); color: var(--kali-text-primary);">
-                                    <span>github.com</span>
-                                    <span class="badge bg-primary rounded-pill">5</span>
+
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="analytics-metric">
+                                    <h6>Average Length</h6>
+                                    <div class="metric-value" id="averageLengthMetric">0</div>
+                                    <p class="metric-subtext">Recommended: 12+ characters</p>
                                 </div>
-                                <div class="list-group-item d-flex justify-content-between align-items-center" style="background: var(--kali-card-bg); border: 1px solid var(--kali-border); color: var(--kali-text-primary);">
-                                    <span>google.com</span>
-                                    <span class="badge bg-primary rounded-pill">3</span>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="analytics-metric">
+                                    <h6>Contains Numbers</h6>
+                                    <div class="metric-value" id="numericPasswordMetric">0</div>
+                                    <p class="metric-subtext">Passwords that include digits</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="analytics-metric">
+                                    <h6>Special Characters</h6>
+                                    <div class="metric-value" id="symbolPasswordMetric">0</div>
+                                    <p class="metric-subtext">Passwords with punctuation or symbols</p>
                                 </div>
                             </div>
                         </div>
@@ -994,33 +1051,163 @@
 
 {% block extra_js %}
 <script>
-let passwords = [];
+var passwords = window.SecureVaultPasswords || [];
+window.SecureVaultPasswords = passwords;
 
-// Load passwords on page load
-$(document).ready(function() {
-    console.log('Document ready, loading passwords...');
-    
-    // Check if jQuery is working
-    if (typeof $ === 'undefined') {
-        console.error('jQuery not loaded!');
-        document.getElementById('passwordsList').innerHTML = `
-            <div class="text-center py-5">
-                <i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: var(--kali-danger);"></i>
-                <h4>JavaScript Error</h4>
-                <p class="text-secondary">jQuery not loaded properly</p>
-            </div>
-        `;
+function initializeDashboardScripts() {
+    if (typeof window.jQuery === 'undefined') {
+        console.warn('jQuery not available yet for dashboard initialization, retrying...');
+        setTimeout(initializeDashboardScripts, 50);
         return;
     }
-    
-    loadPasswords();
-});
+
+    if (window.SecureVaultDashboardInitialized) {
+        return;
+    }
+
+    window.SecureVaultDashboardInitialized = true;
+
+    // Configure AJAX to send credentials (cookies) with all requests
+    $.ajaxSetup({
+        xhrFields: {
+            withCredentials: true
+        },
+        crossDomain: false
+    });
+
+    $(function() {
+        console.log('Document ready, loading passwords...');
+
+        // Check if jQuery is working
+        if (typeof $ === 'undefined') {
+            console.error('jQuery not loaded!');
+            document.getElementById('passwordsList').innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: var(--kali-danger);"></i>
+                    <h4>JavaScript Error</h4>
+                    <p class="text-secondary">jQuery not loaded properly</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Use preloaded passwords from server if available (check for non-null, not truthy)
+        {% if initial_passwords is not none %}
+        console.log('Using preloaded passwords from server:', {{ initial_passwords | tojson }});
+        passwords = {{ initial_passwords | tojson }};
+        displayPasswords();
+        updateStats();
+        {% endif %}
+
+        // Always load fresh data from API with a slight delay to ensure session is ready
+        setTimeout(function() {
+            loadPasswords();
+        }, 100);
+
+        // Attach real-time listeners after DOM is ready
+        $('#password').on('input', checkPasswordStrength);
+        $('#new_password').on('input', checkChangePasswordStrength);
+        $('#confirm_new_password').on('input', validateChangePasswords);
+
+        if ($('#settingsSection').is(':visible')) {
+            load2FAStatus();
+        }
+    });
+}
+
+initializeDashboardScripts();
+
+function normalizePassword(value) {
+    if (typeof value === 'string') {
+        return value;
+    }
+
+    if (value === null || value === undefined) {
+        return '';
+    }
+
+    return String(value);
+}
+
+function hasDigits(password) {
+    return /\d/.test(normalizePassword(password));
+}
+
+function hasSpecialCharacters(password) {
+    return /[^a-zA-Z0-9]/.test(normalizePassword(password));
+}
+
+function hasMixedCase(password) {
+    const pwd = normalizePassword(password);
+    return /[a-z]/.test(pwd) && /[A-Z]/.test(pwd);
+}
+
+function isStrongPassword(password) {
+    const pwd = normalizePassword(password);
+    if (pwd.length < 12) {
+        return false;
+    }
+
+    let score = 0;
+    if (hasMixedCase(pwd)) score++;
+    if (hasDigits(pwd)) score++;
+    if (hasSpecialCharacters(pwd)) score++;
+
+    return score >= 2;
+}
+
+function getPasswordStrengthLevel(password) {
+    const pwd = normalizePassword(password);
+
+    if (!pwd) {
+        return 'weak';
+    }
+
+    const lengthScore = pwd.length >= 12 ? 2 : pwd.length >= 8 ? 1 : 0;
+    const diversityScore = [hasMixedCase(pwd), hasDigits(pwd), hasSpecialCharacters(pwd)].filter(Boolean).length;
+    const totalScore = lengthScore + diversityScore;
+
+    if (totalScore >= 4) {
+        return 'strong';
+    }
+
+    if (totalScore >= 2) {
+        return 'medium';
+    }
+
+    return 'weak';
+}
+
+function updateProgressBar(selector, percentage, label) {
+    const bar = $(selector);
+    const safePercentage = Math.min(100, Math.max(0, percentage));
+    bar.css('width', `${safePercentage}%`).text(label);
+}
+
+function getOverallStrengthBadge(strengthBuckets) {
+    const total = strengthBuckets.weak + strengthBuckets.medium + strengthBuckets.strong;
+
+    if (total === 0) {
+        return 'No data';
+    }
+
+    if (strengthBuckets.strong / total >= 0.6) {
+        return 'Rock Solid';
+    }
+
+    if (strengthBuckets.medium / total >= 0.5) {
+        return 'Balanced';
+    }
+
+    return 'Needs Attention';
+}
 
 function loadPasswords() {
-    console.log('Loading passwords...');
+    console.log('Loading passwords via AJAX...');
     
-    // Clear existing passwords to prevent stale data
-    passwords = [];
+    // Show loading state
+    const container = $('#passwordsList');
+    const currentContent = container.html();
     
     // Clear search field
     $('#searchInput').val('');
@@ -1033,7 +1220,9 @@ function loadPasswords() {
         cache: false,
         success: function(data) {
             console.log('Passwords loaded successfully:', data);
-            passwords = data || [];
+            // Ensure data is an array
+            passwords = Array.isArray(data) ? data : [];
+            console.log('Updated passwords array:', passwords);
             displayPasswords();
             updateStats();
         },
@@ -1042,15 +1231,20 @@ function loadPasswords() {
             console.log('XHR status:', xhr.status);
             console.log('Response text:', xhr.responseText);
             
-            passwords = [];
-            $('#passwordsList').html(`
-                <div class="text-center py-4">
-                    <i class="fas fa-exclamation-triangle fa-2x mb-2" style="color: var(--kali-danger);"></i>
-                    <h5>Error Loading Passwords</h5>
-                    <p class="text-secondary small">Error: ${error} (Status: ${xhr.status})</p>
-                    <button class="btn btn-sm btn-kali mt-2" onclick="loadPasswords()">Retry</button>
-                </div>
-            `);
+            // Only show error if we don't already have passwords displayed
+            if (passwords.length === 0) {
+                container.html(`
+                    <div class="text-center py-4">
+                        <i class="fas fa-exclamation-triangle fa-2x mb-2" style="color: var(--kali-danger);"></i>
+                        <h5>Error Loading Passwords</h5>
+                        <p class="text-secondary small">Error: ${error} (Status: ${xhr.status})</p>
+                        <button class="btn btn-sm btn-kali mt-2" onclick="loadPasswords()">Retry</button>
+                    </div>
+                `);
+            } else {
+                // We have existing passwords, show them and warn
+                showNotification('Failed to refresh passwords. Using cached data.', 'warning');
+            }
         }
     });
 }
@@ -1059,24 +1253,23 @@ function displayPasswords() {
     console.log('Displaying passwords:', passwords);
     const container = $('#passwordsList');
     
+    // Always clear container first to ensure fresh render
     if (passwords.length === 0) {
-        console.log('No passwords to display - keeping empty state');
-        // Don't update if already showing empty state (prevents flicker)
-        if (!container.text().includes('No Passwords Yet')) {
-            container.html(`
-                <div class="text-center py-4">
-                    <i class="fas fa-key fa-2x mb-2" style="color: var(--kali-text-secondary);"></i>
-                    <h5>No Passwords Yet</h5>
-                    <p class="text-secondary small mb-3">Click "Add Password" to get started</p>
-                    <button class="btn btn-sm btn-kali" onclick="showAddPasswordModal()">
-                        <i class="fas fa-plus me-2"></i>Add Your First Password
-                    </button>
-                </div>
-            `);
-        }
+        console.log('No passwords to display - showing empty state');
+        container.html(`
+            <div class="text-center py-4">
+                <i class="fas fa-key fa-2x mb-2" style="color: var(--kali-text-secondary);"></i>
+                <h5>No Passwords Yet</h5>
+                <p class="text-secondary small mb-3">Click "Add Password" to get started</p>
+                <button class="btn btn-sm btn-kali" onclick="showAddPasswordModal()">
+                    <i class="fas fa-plus me-2"></i>Add Your First Password
+                </button>
+            </div>
+        `);
         return;
     }
     
+    console.log('Rendering', passwords.length, 'passwords');
     let html = '';
     passwords.forEach(pwd => {
         html += `
@@ -1124,21 +1317,118 @@ function displayPasswords() {
     });
     
     container.html(html);
+    console.log('Passwords displayed successfully');
 }
 
 function updateStats() {
     const totalPasswords = passwords.length;
     const uniqueWebsites = [...new Set(passwords.map(p => p.website_name))].length;
-    const strongPasswords = passwords.filter(p => p.password.length >= 12).length;
-    const recentPasswords = passwords.filter(p => {
-        // This would need a created_at field from the database
-        return true; // Placeholder
-    }).length;
-    
+    const strongPasswords = passwords.filter(isStrongPassword).length;
+    const specialCharacterPasswords = passwords.filter(hasSpecialCharacters).length;
+
+    const strengthBuckets = {
+        weak: 0,
+        medium: 0,
+        strong: 0
+    };
+
+    let totalLength = 0;
+    let containsNumbers = 0;
+    let containsSymbols = 0;
+
+    const websiteCounts = {};
+
+    passwords.forEach(pwd => {
+        const password = pwd.password || '';
+        totalLength += password.length;
+
+        if (hasDigits(password)) {
+            containsNumbers++;
+        }
+
+        if (hasSpecialCharacters(password)) {
+            containsSymbols++;
+        }
+
+        const strength = getPasswordStrengthLevel(password);
+        strengthBuckets[strength]++;
+
+        const websiteKey = (pwd.website_name || 'Unknown').trim().toLowerCase();
+        if (!websiteCounts[websiteKey]) {
+            websiteCounts[websiteKey] = {
+                name: pwd.website_name || 'Unknown',
+                count: 0
+            };
+        }
+        websiteCounts[websiteKey].count++;
+    });
+
+    const averageLength = totalPasswords > 0 ? Math.round((totalLength / totalPasswords) * 10) / 10 : 0;
+    const numericPercentage = totalPasswords > 0 ? Math.round((containsNumbers / totalPasswords) * 100) : 0;
+    const symbolPercentage = totalPasswords > 0 ? Math.round((containsSymbols / totalPasswords) * 100) : 0;
+
+    // Update summary cards
     $('#totalPasswords').text(totalPasswords);
     $('#totalWebsites').text(uniqueWebsites);
     $('#strongPasswords').text(strongPasswords);
-    $('#recentPasswords').text(recentPasswords);
+    $('#specialCharacterPasswords').text(specialCharacterPasswords);
+
+    // Update analytics section visibility
+    if (totalPasswords === 0) {
+        $('#analyticsEmptyState').show();
+        $('#analyticsContent').hide();
+        return;
+    }
+
+    $('#analyticsEmptyState').hide();
+    $('#analyticsContent').show();
+
+    // Strength distribution progress bars
+    const weakPercentage = Math.round((strengthBuckets.weak / totalPasswords) * 100);
+    const mediumPercentage = Math.round((strengthBuckets.medium / totalPasswords) * 100);
+    const strongPercentage = Math.max(0, 100 - weakPercentage - mediumPercentage);
+
+    updateProgressBar('#strengthWeakBar', weakPercentage, `Weak ${weakPercentage}%`);
+    updateProgressBar('#strengthMediumBar', mediumPercentage, `Medium ${mediumPercentage}%`);
+    updateProgressBar('#strengthStrongBar', strongPercentage, `Strong ${strongPercentage}%`);
+
+    $('#weakCountLabel').text(`Weak: ${strengthBuckets.weak}`);
+    $('#mediumCountLabel').text(`Medium: ${strengthBuckets.medium}`);
+    $('#strongCountLabel').text(`Strong: ${strengthBuckets.strong}`);
+
+    $('#overallStrengthBadge').text(getOverallStrengthBadge(strengthBuckets));
+
+    // Top websites list
+    const sortedWebsites = Object.values(websiteCounts)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+    const topWebsitesList = $('#topWebsitesList');
+    topWebsitesList.empty();
+
+    sortedWebsites.forEach(site => {
+        const percentage = Math.round((site.count / totalPasswords) * 100);
+        topWebsitesList.append(`
+            <li>
+                <span>${site.name}</span>
+                <span class="analytics-badge">${site.count} · ${percentage}%</span>
+            </li>
+        `);
+    });
+
+    const remainingWebsites = uniqueWebsites - sortedWebsites.length;
+    if (remainingWebsites > 0) {
+        $('#topWebsitesSummary').text(`Plus ${remainingWebsites} more ${(remainingWebsites === 1 ? 'site' : 'sites')} with saved passwords.`);
+    } else {
+        $('#topWebsitesSummary').text('');
+    }
+
+    $('#uniqueWebsitesBadge').text(`${uniqueWebsites} unique`);
+
+    // Metric cards
+    $('#averageLengthMetric').text(averageLength);
+    $('#numericPasswordMetric').text(`${numericPercentage}%`);
+    $('#symbolPasswordMetric').text(`${symbolPercentage}%`);
 }
 
 function showAddPasswordModal() {
@@ -1386,6 +1676,9 @@ function showSettings() {
     // Update sidebar active state
     $('.sidebar-nav a').removeClass('active');
     $('.sidebar-nav a:contains("Settings")').addClass('active');
+
+    // Ensure settings data is refreshed when view opens
+    load2FAStatus();
 }
 
 function showAnalytics() {
@@ -1397,6 +1690,9 @@ function showAnalytics() {
     // Update sidebar active state
     $('.sidebar-nav a').removeClass('active');
     $('.sidebar-nav a:contains("Analytics")').addClass('active');
+
+    // Refresh analytics in case passwords changed recently
+    updateStats();
 }
 
 function showPasswords() {
@@ -1497,10 +1793,6 @@ function validateChangePasswords() {
     }
 }
 
-// Password strength checker for change password
-$('#new_password').on('input', checkChangePasswordStrength);
-$('#confirm_new_password').on('input', validateChangePasswords);
-
 // Search functionality
 function searchPasswords() {
     const searchTerm = $('#searchInput').val().toLowerCase().trim();
@@ -1583,30 +1875,6 @@ function toggle2FA() {
         }
     }
 }
-
-// Load 2FA status when settings section is shown
-function showSettings() {
-    $('#passwordsSection').hide();
-    $('#analyticsSection').hide();
-    $('#settingsSection').show();
-    
-    // Update active nav
-    $('.nav-link').removeClass('active');
-    $('a[onclick="showSettings()"]').addClass('active');
-    
-    // Load 2FA status
-    load2FAStatus();
-}
-
-// Password strength checker
-$('#password').on('input', checkPasswordStrength);
-
-// Load 2FA status on page load if settings is visible
-$(document).ready(function() {
-    if ($('#settingsSection').is(':visible')) {
-        load2FAStatus();
-    }
-});
 
 // Export Passwords Function
 function exportPasswords() {
