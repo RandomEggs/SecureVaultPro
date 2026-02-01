@@ -3,8 +3,8 @@
 <div align="center">
 
 ![SecureVault Pro](https://img.shields.io/badge/SecureVault-Pro-6b0f8a?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-3.1-000000?style=for-the-badge&logo=flask)
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.x-000000?style=for-the-badge&logo=flask)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 
 **A modern, secure password manager with military-grade encryption**
@@ -21,142 +21,192 @@ SecureVault Pro is a full-stack password management application built with Flask
 
 ## Features
 
-- 🔒 **Secure Storage** - Fernet symmetric encryption for all passwords
-- 🔐 **Two-Factor Authentication** - TOTP-based 2FA with QR codes and backup codes
-- 📧 **Email Verification** - Secure account activation
-- 🔑 **Password Generator** - Generate strong, random passwords
-- 📥 **Import/Export** - Bulk password management via CSV
-- 🎨 **Modern UI** - Responsive design with smooth animations
-- 🛡️ **Security Headers** - CSRF protection, rate limiting, and secure headers
-- 🔍 **Search & Filter** - Quick password lookup
+- 🔒 **Encrypted Vault** – Fernet symmetric encryption for every stored password
+- 🔐 **Two-Factor Authentication** – TOTP-based 2FA with QR setup + backup codes
+- 📧 **Transactional Email** – Email verification and password-reset flows via Gmail API
+- 🔑 **Strong Password Generator** – One-click generator with live strength feedback
+- 📥 **CSV Import / Export** – Bulk management with Chrome/Firefox/Edge formats
+- 📊 **Analytics Dashboard** – Password strength insights, reuse detection, top sites
+- 🎨 **Responsive UI** – Modern, dark-themed dashboard tuned for desktop & mobile
+- 🛡️ **Security Hardening** – CSRF, HSTS, rate limiting, secure cookies, strict CSP
 
 ## Tech Stack
 
-- **Backend**: Flask, SQLAlchemy, PostgreSQL
-- **Security**: bcrypt, Fernet encryption, Flask-WTF, Flask-Limiter
-- **Authentication**: Flask-Login, PyOTP
-- **Frontend**: Bootstrap 5, Font Awesome, jQuery
-- **Deployment**: Gunicorn, Render.com
+| Layer | Tools |
+| --- | --- |
+| Backend | Flask, SQLAlchemy, Flask-Login, Flask-Limiter |
+| Database | PostgreSQL (Neon or self-hosted) |
+| Security | bcrypt, cryptography (Fernet), PyOTP, Flask-WTF |
+| Frontend | HTML5, Bootstrap 5, Vanilla JS + jQuery |
+| Deployment | Gunicorn, Render / Docker-compatible environments |
 
-## Installation
+---
 
-### Prerequisites
-- Python 3.12+
-- PostgreSQL
-- Gmail account (for SMTP)
+## Getting Started
 
-### Quick Start
+### 1. Prerequisites
 
-1. **Clone the repository**
+- Python **3.11+**
+- PostgreSQL instance (local, Docker, or managed such as Neon)
+- Gmail API credentials if you plan to send verification/reset emails (optional for local dev)
+
+### 2. Clone & Setup
+
 ```bash
 git clone https://github.com/yourusername/securevault-pro.git
 cd securevault-pro/backend
-```
 
-2. **Create virtual environment**
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\activate
-```
+# Create and activate a virtual environment
+python -m venv .venv
+# Windows
+.\.venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
 
-3. **Install dependencies**
-```bash
+# Install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-4. **Configure environment**
-```bash
-cp .env.example .env
-# Edit .env with your configuration
+### 3. Configure Environment
+
+Create a `.env` file inside `backend/` (you can copy from `.env.example` if present) and supply the required keys:
+
+```env
+FLASK_SECRET_KEY="your-flask-secret"
+SESSION_COOKIE_SECURE=False           # True in production over HTTPS
+FORCE_HTTPS=False                     # True in production (Render, etc.)
+
+# Database
+DATABASE_URL="postgresql://user:password@host:5432/securevault"
+
+# Encryption key for password storage (32 url-safe base64 bytes)
+ENCRYPTION_KEY="<generated_fernet_key>"
+
+# (Optional) Gmail OAuth credentials for email flows
+GMAIL_CLIENT_ID="..."
+GMAIL_CLIENT_SECRET="..."
+GMAIL_REFRESH_TOKEN="..."
+GMAIL_SENDER_EMAIL="your-address@gmail.com"
+
+# Application URL (used in email links)
+APP_URL="http://localhost:5000"
 ```
 
-5. **Initialize database**
+> ⚠️ Generate a Fernet key via `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`
+
+If you plan to use Gmail, run `generate_gmail_token.py` once to obtain a refresh token (store `credentials.json` and resulting `token.json` outside of version control).
+
+### 4. Initialize Database
+
 ```bash
 python init_db.py
 ```
 
-6. **Run the application**
+This will create tables using SQLAlchemy models. Ensure your `DATABASE_URL` is reachable.
+
+### 5. Run the Development Server
+
 ```bash
 python app.py
 ```
 
-Visit http://localhost:5000
+Visit **http://127.0.0.1:5000** and sign up with a new account. In development you can toggle `FLASK_DEBUG` in `.env` for auto-reload.
 
-## Configuration
+---
 
-Create a `.env` file with the following variables:
+## Gmail Email Integration (Optional)
 
-```env
-FLASK_SECRET_KEY=your-secret-key
-JWT_SECRET=your-jwt-secret
-DATABASE_URL=postgresql://user:pass@host:port/db
-ENCRYPTION_KEY=your-fernet-key
-SMTP_USERNAME=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
+1. Enable the Gmail API in Google Cloud Console and create an OAuth client (Desktop).
+2. Save `credentials.json` inside `backend/`.
+3. Run `python generate_gmail_token.py` to authorize and create `token.json`.
+4. Copy the printed `GMAIL_*` values into `.env`.
+
+The app will automatically use Gmail API for verification and reset emails once these values are present. Without them, email calls fail gracefully.
+
+---
+
+## Command Reference
+
+| Task | Command |
+| --- | --- |
+| Run tests (if added) | `pytest` |
+| Format with black | `black .` |
+| Start dev server | `python app.py` |
+| Refresh requirements | `pip freeze > requirements.txt` |
+
+---
+
+## Database Notes
+
+- Uses PostgreSQL with SQLAlchemy.
+- Connection pooling configured with `pool_pre_ping` to avoid Neon cold-start staleness.
+- Passwords are encrypted at rest; only decrypted in memory per-request.
+
+To inspect schema quickly:
+
+```bash
+python - <<'PY'
+from database import get_session
+from models import User, Password
+with get_session() as session:
+    print(session.execute("SELECT count(*) FROM users").scalar())
+PY
 ```
 
-## Security
+---
 
-SecureVault Pro implements industry-standard security practices:
+## Frontend Overview
 
-- ✅ Fernet encryption (AES-128) for password storage
-- ✅ bcrypt password hashing with salt
-- ✅ CSRF protection on all forms
-- ✅ Rate limiting to prevent brute force
-- ✅ Security headers (CSP, HSTS, X-Frame-Options)
-- ✅ HTTPOnly and Secure session cookies
-- ✅ Input validation and sanitization
-- ✅ Two-factor authentication support
+- Dashboard located in `backend/templates/dashboard.html`.
+- Responsive layout with CSS defined in `base.html`.
+- Password analytics + CSV import logic implemented directly in the template JS.
 
-## Deployment
+---
 
-### Render.com
+## Deployment Checklist
 
-1. Create a new Web Service
-2. Connect your GitHub repository
-3. Set environment variables in Render dashboard
-4. Deploy with: `gunicorn app:app`
+1. Set `FORCE_HTTPS=True` and `SESSION_COOKIE_SECURE=True`.
+2. Provide production `.env` via environment variables (Render, Heroku, etc.).
+3. Use Gunicorn entrypoint: `gunicorn app:app`.
+4. Attach a managed Postgres database; run `python init_db.py` once.
+5. Configure Gmail credentials or swap to your preferred email provider.
 
-For detailed deployment instructions, see [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md)
+For Render-specific steps, see `Procfile` or create a Render service pointing at `/backend` with the above command.
 
-## Usage
+---
 
-### Creating an Account
-1. Navigate to `/signup`
-2. Enter email and password
-3. Verify email address
-4. Login at `/login`
+## Security Practices
 
-### Managing Passwords
-- Add new passwords with the "Add Password" button
-- View, edit, or delete existing passwords
-- Use the search function to find passwords quickly
-- Export passwords to CSV for backup
+- Fernet (AES-128) encryption for stored passwords
+- bcrypt password hashing w/ per-user salt
+- CSRF protection, strict Content-Security-Policy via Flask-Talisman
+- Rate limiting on auth endpoints (Flask-Limiter)
+- HTTPOnly, Secure session cookies + SameSite=Lax
+- Two-factor authentication (TOTP) support
 
-### Two-Factor Authentication
-1. Go to "Setup 2FA" in the dashboard
-2. Scan QR code with authenticator app
-3. Enter verification code
-4. Save backup codes securely
+---
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Pull requests and issues are welcome! Please:
+
+1. Fork the repo and create a feature branch.
+2. Ensure lint/tests pass.
+3. Describe your changes and attach screenshots for UI tweaks.
+
+---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For issues and questions, please open an issue on GitHub.
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 
 <div align="center">
 
-**Built with ❤️ using Flask and Python**
+**Built with ❤️ using Flask & PostgreSQL**
 
-⭐ Star this repository if you find it useful!
+If this project helps you, consider leaving a ⭐
 
 </div>
