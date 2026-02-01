@@ -920,18 +920,18 @@
                 <form id="addPasswordForm">
                     <div class="mb-3">
                         <label for="websiteName" class="form-label">Website Name</label>
-                        <input type="text" class="form-control" id="websiteName" required 
+                        <input type="text" class="form-control" id="websiteName" name="website_name" autocomplete="url" required 
                                minlength="1" maxlength="100" placeholder="e.g., GitHub, Google, Facebook">
                     </div>
                     <div class="mb-3">
                         <label for="username" class="form-label">Username/Email</label>
-                        <input type="text" class="form-control" id="username" required 
+                        <input type="text" class="form-control" id="username" name="username" autocomplete="username" required 
                                minlength="1" maxlength="100" placeholder="e.g., john.doe@example.com">
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="password" required 
+                            <input type="password" class="form-control" id="password" name="password" autocomplete="new-password" required 
                                    minlength="4" maxlength="200" placeholder="Enter your password">
                             <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility()">
                                 <i class="fas fa-eye" id="passwordToggle"></i>
@@ -970,18 +970,18 @@
                     <input type="hidden" id="editPasswordId">
                     <div class="mb-3">
                         <label for="editWebsiteName" class="form-label">Website Name</label>
-                        <input type="text" class="form-control" id="editWebsiteName" required 
+                        <input type="text" class="form-control" id="editWebsiteName" name="edit_website_name" autocomplete="url" required 
                                minlength="1" maxlength="100" placeholder="e.g., GitHub, Google, Facebook">
                     </div>
                     <div class="mb-3">
                         <label for="editUsername" class="form-label">Username/Email</label>
-                        <input type="text" class="form-control" id="editUsername" required 
+                        <input type="text" class="form-control" id="editUsername" name="edit_username" autocomplete="username" required 
                                minlength="1" maxlength="100" placeholder="e.g., john.doe@example.com">
                     </div>
                     <div class="mb-3">
                         <label for="editPassword" class="form-label">Password</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="editPassword" required 
+                            <input type="password" class="form-control" id="editPassword" name="edit_password" autocomplete="new-password" required 
                                    minlength="4" maxlength="200" placeholder="Enter your password">
                             <button class="btn btn-outline-secondary" type="button" onclick="toggleEditPasswordVisibility()">
                                 <i class="fas fa-eye" id="editPasswordToggle"></i>
@@ -1054,6 +1054,80 @@
 var passwords = window.SecureVaultPasswords || [];
 window.SecureVaultPasswords = passwords;
 
+function dedupePasswords(passwordList) {
+    if (!Array.isArray(passwordList)) {
+        return [];
+    }
+
+    const seen = new Set();
+    return passwordList.filter(item => {
+        if (!item) {
+            return false;
+        }
+
+        const key = item.id != null ? `id:${item.id}` : `val:${(item.website_name || '').toLowerCase()}|${(item.username || '').toLowerCase()}|${item.password || ''}`;
+        if (seen.has(key)) {
+            return false;
+        }
+        seen.add(key);
+        return true;
+    });
+}
+
+function normalizeSingleLineField(value, options = {}) {
+    const { allowComma = true } = options;
+
+    if (typeof value !== 'string') {
+        return '';
+    }
+
+    let normalized = value.trim();
+    if (!normalized) {
+        return '';
+    }
+
+    const lineParts = normalized
+        .split(/\r?\n+/)
+        .map(part => part.trim())
+        .filter(Boolean);
+
+    normalized = lineParts.length ? lineParts[0] : normalized;
+
+    if (!allowComma && normalized.includes(',')) {
+        const commaParts = normalized
+            .split(',')
+            .map(part => part.trim())
+            .filter(Boolean);
+        normalized = commaParts.length ? commaParts[0] : normalized;
+    }
+
+    return normalized;
+}
+
+function normalizePasswordField(value) {
+    if (typeof value !== 'string') {
+        return '';
+    }
+
+    let normalized = value.trim();
+    if (!normalized) {
+        return '';
+    }
+
+    const lineParts = normalized
+        .split(/\r?\n+/)
+        .map(part => part.trim())
+        .filter(Boolean);
+
+    normalized = lineParts.length ? lineParts[0] : normalized;
+
+    if (normalized.endsWith(',') && !normalized.includes(' ')) {
+        normalized = normalized.slice(0, -1);
+    }
+
+    return normalized;
+}
+
 function initializeDashboardScripts() {
     if (typeof window.jQuery === 'undefined') {
         console.warn('jQuery not available yet for dashboard initialization, retrying...');
@@ -1094,7 +1168,7 @@ function initializeDashboardScripts() {
         // Use preloaded passwords from server if available (check for non-null, not truthy)
         {% if initial_passwords is not none %}
         console.log('Using preloaded passwords from server:', {{ initial_passwords | tojson }});
-        passwords = {{ initial_passwords | tojson }};
+        passwords = dedupePasswords({{ initial_passwords | tojson }});
         displayPasswords();
         updateStats();
         {% endif %}
@@ -1221,7 +1295,7 @@ function loadPasswords() {
         success: function(data) {
             console.log('Passwords loaded successfully:', data);
             // Ensure data is an array
-            passwords = Array.isArray(data) ? data : [];
+            passwords = dedupePasswords(Array.isArray(data) ? data : []);
             console.log('Updated passwords array:', passwords);
             displayPasswords();
             updateStats();
@@ -1323,8 +1397,8 @@ function displayPasswords() {
 function updateStats() {
     const totalPasswords = passwords.length;
     const uniqueWebsites = [...new Set(passwords.map(p => p.website_name))].length;
-    const strongPasswords = passwords.filter(isStrongPassword).length;
-    const specialCharacterPasswords = passwords.filter(hasSpecialCharacters).length;
+    const strongPasswords = passwords.filter(p => isStrongPassword(p.password)).length;
+    const specialCharacterPasswords = passwords.filter(p => hasSpecialCharacters(p.password)).length;
 
     const strengthBuckets = {
         weak: 0,
@@ -1440,21 +1514,22 @@ function showAddPasswordModal() {
 
 function showEditPasswordModal(id) {
     const password = passwords.find(p => p.id === id);
-    if (!password) return;
-    
+    if (!password) {
+        return;
+    }
+
     $('#editPasswordId').val(id);
-    $('#editWebsiteName').val(password.website_name);
-    $('#editUsername').val(password.username);
-    $('#editPassword').val(password.password);
+    $('#editWebsiteName').val(password.website_name || '');
+    $('#editUsername').val(password.username || '');
+    $('#editPassword').val(password.password || '');
     $('#editPasswordModal').modal('show');
 }
 
 function addPassword() {
-    const websiteName = $('#websiteName').val().trim();
-    const username = $('#username').val().trim();
-    const password = $('#password').val().trim();
+    const websiteName = normalizeSingleLineField($('#websiteName').val(), { allowComma: false });
+    const username = normalizeSingleLineField($('#username').val(), { allowComma: false });
+    const password = normalizePasswordField($('#password').val());
     
-    // Frontend validation
     if (!websiteName) {
         showNotification('Website name is required', 'error');
         $('#websiteName').focus();
@@ -1507,9 +1582,9 @@ function addPassword() {
 
 function updatePassword() {
     const id = $('#editPasswordId').val();
-    const websiteName = $('#editWebsiteName').val().trim();
-    const username = $('#editUsername').val().trim();
-    const password = $('#editPassword').val().trim();
+    const websiteName = normalizeSingleLineField($('#editWebsiteName').val(), { allowComma: false });
+    const username = normalizeSingleLineField($('#editUsername').val(), { allowComma: false });
+    const password = normalizePasswordField($('#editPassword').val());
     
     // Frontend validation
     if (!websiteName) {
@@ -2139,12 +2214,34 @@ function parseCSV(content) {
         if (line) {
             const fields = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
             if (fields && fields.length >= 3) {
-                passwords.push({
-                    website_name: fields[0].replace(/"/g, ''),
-                    username: fields[1].replace(/"/g, ''),
-                    password: fields[2].replace(/"/g, ''),
-                    notes: fields[3] ? fields[3].replace(/"/g, '') : ''
-                });
+                const cleanedFields = fields.map(field => field.replace(/^"|"$/g, '').trim());
+
+                let websiteName = cleanedFields[0] || '';
+                let username = cleanedFields[1] || '';
+                let passwordValue = cleanedFields[2] || '';
+                let notes = cleanedFields[3] || '';
+
+                // Detect Chrome export (name, url, username, password, note...)
+                if (cleanedFields.length >= 4 && /^https?:\/\//i.test(cleanedFields[1])) {
+                    const url = cleanedFields[1];
+                    websiteName = cleanedFields[0] || url;
+                    username = cleanedFields[2] || '';
+                    passwordValue = cleanedFields[3] || '';
+                    notes = cleanedFields[4] || '';
+
+                    if (!notes && url) {
+                        notes = `URL: ${url}`;
+                    }
+                }
+
+                if (websiteName && username && passwordValue) {
+                    passwords.push({
+                        website_name: websiteName,
+                        username: username,
+                        password: passwordValue,
+                        notes: notes || ''
+                    });
+                }
             }
         }
     }
@@ -2163,13 +2260,31 @@ function parseJSON(content, format) {
 }
 
 function parseChromeFormat(content) {
-    const data = JSON.parse(content);
-    return data.map(item => ({
-        website_name: item.name,
-        username: item.username,
-        password: item.password,
-        notes: ''
-    }));
+    // Chrome exports as CSV: name, url, username, password
+    const lines = content.split('\n');
+    const passwords = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line) {
+            // Match CSV fields, handling quotes
+            const fields = line.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+
+            // Skip Chrome header or empty lines
+            if (!fields || (fields[0] && fields[0].toLowerCase().replace(/"/g, '') === 'name')) continue;
+
+            // Chrome CSVs usually have 4 columns. We map them correctly here.
+            if (fields.length >= 4) {
+                passwords.push({
+                    website_name: fields[0].replace(/"/g, ''),
+                    username: fields[2].replace(/"/g, ''),
+                    password: fields[3].replace(/"/g, ''),
+                    notes: fields[1].replace(/"/g, '')
+                });
+            }
+        }
+    }
+    return passwords;
 }
 
 function parseFirefoxFormat(content) {
