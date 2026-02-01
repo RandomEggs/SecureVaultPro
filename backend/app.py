@@ -79,7 +79,7 @@ app.config["SESSION_COOKIE_SECURE"] = (
 )
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=1)
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 
 # Configure secure logging
@@ -165,6 +165,11 @@ def login():
                 # Check if user has 2FA enabled
                 result = db.execute(select(MFATOTP).where(MFATOTP.user_id == user.id))
                 mfa = result.scalar_one_or_none()
+
+                if request.form.get("remember"):
+                    session.permanent = True
+                else:
+                    session.permanent = False
 
                 if mfa and mfa.is_enabled:
                     # Store user info temporarily and redirect to 2FA verification
