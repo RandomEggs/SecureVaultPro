@@ -14,14 +14,20 @@
 
 # Python
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+.venv/
 *venv/
 venv/
 ENV/
 env/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.Python
 build/
 develop-eggs/
 dist/
@@ -38,6 +44,11 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# Coverage / reports
+.coverage
+coverage.xml
+htmlcov/
 
 # Database Files
 *.db
@@ -59,6 +70,12 @@ MANIFEST
 logs/
 *.log.*
 
+# Local tooling
+.vscode/
+.idea/
+.editorconfig
+.python-version
+
 # OS Files
 .DS_Store
 Thumbs.db
@@ -78,15 +95,18 @@ credentials/
 credentials.json
 token.json
 gmail_credentials.json
+client_secret.json
+client_secret_*.json
 
 # Test & Debug Files
 test_*.py
 *_test.py
-.pytest_cache/
-.coverage
-htmlcov/
 .tox/
 .nox/
+
+# Temporary files
+tmp/
+temp/
 
 # Deployment Files
 RENDER_ENV.txt
